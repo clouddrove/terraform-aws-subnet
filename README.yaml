@@ -1,0 +1,84 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name : Terraform AWS Subnet
+
+# License of this project
+license: "MIT"
+
+# Canonical GitHub repo
+github_repo: clouddrove/terraform-aws-subnet
+
+# Badges to display
+badges:
+  - name: "Terraform"
+    image: "https://img.shields.io/badge/Terraform-v0.12-green"
+    url: "https://www.terraform.io"
+  - name: "Licence"
+    image: "https://img.shields.io/badge/License-MIT-blue.svg"
+    url: "LICENSE.md"
+
+#  description of this project
+description: |-
+  Terraform module to create public, private and public-private subnet with network acl, route table, Elastic IP, nat gateway, flow log.
+
+# extra content
+include:
+  - "terraform.md"
+
+# How to use this project
+usage : |-
+  Here are some examples of how you can use this module in your inventory structure:
+  ### Private Subnet
+  ```hcl
+    module "subnets" {
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git"
+      name                = "subnets"
+      application         = "clouddrove"
+      environment         = "test"
+      label_order         = ["application", "environment", "name"]
+      availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id              = "vpc-xxxxxxxxx"
+      type                = "private"
+      nat_gateway_enabled = true
+      cidr_block          = "10.0.0.0/16"
+      public_subnet_ids   = ["subnet-XXXXXXXXXXXXX", "subnet-XXXXXXXXXXXXX"]
+    }
+  ```
+
+  ### Public-Private Subnet
+  ```hcl
+    module "subnets" {
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git"
+      name                = "subnets"
+      application         = "clouddrove"
+      environment         = "test"
+      label_order         = ["application", "environment", "name"]
+      availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id              = "vpc-xxxxxxxxx"
+      type                = "public-private"
+      igw_id              = "ig-xxxxxxxxx"
+      nat_gateway_enabled = true
+      cidr_block          = "10.0.0.0/16"
+    }
+  ```
+
+  ### Public Subnet
+  ```hcl
+    module "subnets" {
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git"
+      name                = "subnets"
+      application         = "clouddrove"
+      environment         = "test"
+      label_order         = ["application", "environment", "name"]
+      availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+      vpc_id              = "vpc-xxxxxxxxx"
+      type                = "public"
+      igw_id              = "ig-xxxxxxxxx"
+      cidr_block          = "10.0.0.0/16"
+    }
+  ```
