@@ -59,8 +59,9 @@ resource "aws_subnet" "public" {
   lifecycle {
     # Ignore tags added by kubernetes
     ignore_changes = [
-      tags.kubernetes,
-      tags.SubnetType,
+      "tags",
+      tags["kubernetes.io"],
+      tags["SubnetType"],
     ]
   }
 }
