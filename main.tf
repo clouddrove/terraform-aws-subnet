@@ -108,7 +108,7 @@ resource "aws_route_table" "public" {
   tags = merge(
     module.public-labels.tags,
     {
-      "Name" = format("%s%s%s-route-table", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
+      "Name" = format("%s%s%s-rt", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
     }
   )
@@ -227,7 +227,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     module.private-labels.tags,
     {
-      "Name" = format("%s%s%s-route-table", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
+      "Name" = format("%s%s%s-rt", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
     }
   )
@@ -282,7 +282,7 @@ resource "aws_nat_gateway" "private" {
   tags = merge(
     module.private-labels.tags,
     {
-      "Name" = format("%s%s%s-nat-gateway", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
+      "Name" = format("%s%s%s-ng", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
     }
   )
 }
