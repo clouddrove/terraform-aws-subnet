@@ -108,7 +108,7 @@ resource "aws_route_table" "public" {
   tags = merge(
     module.public-labels.tags,
     {
-      "Name" = format("%s%s%s", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
+      "Name" = format("%s%s%s-route-table", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
     }
   )
@@ -226,7 +226,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     module.private-labels.tags,
     {
-      "Name" = format("%s%s%s", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
+      "Name" = format("%s%s%s-route-table", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
     }
   )
@@ -260,7 +260,12 @@ resource "aws_eip" "private" {
   count = local.private_nat_gateways_count
 
   vpc  = true
-  tags = module.private-labels.tags
+  tags = merge(
+  module.private-labels.tags,
+  {
+    "Name" = format("%s%s%s-eip", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
+  }
+  )
   lifecycle {
     create_before_destroy = true
   }
@@ -273,7 +278,12 @@ resource "aws_nat_gateway" "private" {
 
   allocation_id = element(aws_eip.private.*.id, count.index)
   subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public.*.id, count.index) : element(var.public_subnet_ids, count.index)
-  tags          = module.private-labels.tags
+  tags = merge(
+  module.private-labels.tags,
+  {
+    "Name" = format("%s%s%s-nat-gateway", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
+  }
+  )
 }
 
 #Module      : Flow Log

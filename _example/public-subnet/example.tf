@@ -14,12 +14,12 @@ module "vpc" {
 }
 
 module "subnets" {
-  source = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+  source = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.2"
 
   name        = "subnets"
   application = "clouddrove"
   environment = "test"
-  label_order = ["application", "environment", "name"]
+  label_order = ["environment", "name", "application"]
 
   availability_zones = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id             = module.vpc.vpc_id
