@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "git::https://github.com/clouddrove/terraform-aws-vpc.git?ref=tags/0.12.1"
+  source = "git::https://github.com/clouddrove/terraform-aws-vpc.git?ref=tags/0.12.3"
 
   name        = "vpc"
   application = "clouddrove"
@@ -14,12 +14,12 @@ module "vpc" {
 }
 
 module "subnets" {
-  source = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+  source = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.2"
 
   name        = "subnets"
   application = "clouddrove"
   environment = "test"
-  label_order = ["application", "environment", "name"]
+  label_order = ["environment", "application", "name"]
 
   availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id              = module.vpc.vpc_id
