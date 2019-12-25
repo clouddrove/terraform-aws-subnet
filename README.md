@@ -70,7 +70,7 @@ Here are some examples of how you can use this module in your inventory structur
 ### Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.4"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -87,7 +87,7 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public-Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.4"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -104,7 +104,7 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.4"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
