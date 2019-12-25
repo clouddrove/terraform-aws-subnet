@@ -26,7 +26,7 @@ jobs:
         uses: clouddrove/github-actions@v1.0
         with:
           actions_subcommand: 'terratest'
-          tf_actions_working_dir: ./_test/public-private-subnet
+          tf_actions_working_dir: ./_test/public-private-subnet/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
