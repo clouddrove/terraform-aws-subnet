@@ -14,7 +14,7 @@ module "vpc" {
 }
 
 module "subnets" {
-  source = "/../../"
+  source = "./../../"
 
   name        = "subnets"
   application = "clouddrove"
