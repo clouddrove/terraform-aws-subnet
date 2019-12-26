@@ -35,8 +35,6 @@ jobs:
           tf_actions_working_dir: ./_test/public-private-subnet
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: 'Terratest For public-subnet'
         uses: sohanyadav/github-actions@master
@@ -45,8 +43,7 @@ jobs:
           tf_actions_working_dir: ./_test/public-subnet
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 
       - name: 'Slack Notification'
         uses: 8398a7/action-slack@v2
