@@ -45,7 +45,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: 'Slack Notification'
         uses: 8398a7/action-slack@v2
         with:
