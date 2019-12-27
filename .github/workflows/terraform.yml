@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: 'Terraform Format'
-        uses: clouddrove/github-actions@;
+        uses: clouddrove/github-actions@v2.0
           actions_subcommand: 'fmt'
 
       - name: 'Terraform Init For public-private-subnet'
