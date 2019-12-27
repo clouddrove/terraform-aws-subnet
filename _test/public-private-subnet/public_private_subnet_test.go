@@ -38,5 +38,5 @@ func Test(t *testing.T) {
 	assert.Equal(t, expectedPublicSubnetCidrs, publicSubnetCidrs)
 	assert.Equal(t, expectedPrivateSubnetCidrs, privateSubnetCidrs)
 	assert.Equal(t, "test-subnets-clouddrove-public", publicTags["Name"])
-	assert.Equal(t, "ttest-subnets-clouddrove-private", privateTags["Name"])
+	assert.Equal(t, "test-subnets-clouddrove-private", privateTags["Name"])
 }
