@@ -33,5 +33,5 @@ func Test(t *testing.T) {
 
 	// Check that we get back the outputs that we expect
 	assert.Equal(t, expectedPublicSubnetCidrs, publicSubnetCidrs)
-	assert.Equal(t, "test-subnets-clouddrove-public", publicTags["Name"])
+	assert.Equal(t, "test-clouddrove-subnets-public", publicTags["Name"])
 }
