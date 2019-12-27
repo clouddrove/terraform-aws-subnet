@@ -17,13 +17,13 @@ jobs:
           actions_subcommand: 'fmt'
 
       - name: 'Terraform Init For public-private-subnet'
-        uses: clouddrove/github-actions@v2.0
+        uses: clouddrove/github-actions@v1.0
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-private-subnet
 
       - name: 'Terraform Init For public-subnet'
-        uses: clouddrove/github-actions@v2.0
+        uses: clouddrove/github-actions@v1.0
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-private-subnet
