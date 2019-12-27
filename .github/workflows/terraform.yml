@@ -13,6 +13,7 @@ jobs:
 
       - name: 'Terraform Format'
         uses: clouddrove/github-actions@v2.0
+        with:
           actions_subcommand: 'fmt'
 
       - name: 'Terraform Init For public-private-subnet'
