@@ -70,11 +70,11 @@ Here are some examples of how you can use this module in your inventory structur
 ### Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.4"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
-    label_order         = ["application", "environment", "name"]
+    label_order         = ["environment", "name", "application"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "private"
@@ -87,11 +87,11 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public-Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.4"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
-    label_order         = ["application", "environment", "name"]
+    label_order         = ["environment", "name", "application"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "public-private"
@@ -104,11 +104,11 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.1"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.4"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
-    label_order         = ["application", "environment", "name"]
+    label_order         = ["environment", "name", "application"]
     availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "public"

@@ -3,18 +3,18 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "git::https://github.com/clouddrove/terraform-aws-vpc.git?ref=tags/0.12.3"
+  source = "git::https://github.com/clouddrove/terraform-aws-vpc.git?ref=tags/0.12.4"
 
   name        = "vpc"
   application = "clouddrove"
   environment = "test"
-  label_order = ["environment", "name", "application"]
+  label_order = ["environment", "application", "name"]
 
   cidr_block = "10.0.0.0/16"
 }
 
 module "subnets" {
-  source = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.2"
+  source = "./../../"
 
   name        = "subnets"
   application = "clouddrove"
