@@ -54,8 +54,7 @@ resource "aws_subnet" "public" {
     {
       "Name" = format("%s%s%s", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
-    },
-    var.tags
+    }
   )
 
   lifecycle {
