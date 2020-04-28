@@ -30,6 +30,7 @@ module "public-labels" {
   name        = var.name
   application = var.application
   environment = var.environment
+  managedby   = var.managedby
   label_order = var.label_order
   attributes  = compact(concat(var.attributes, list("public")))
 }
