@@ -175,7 +175,8 @@ resource "aws_subnet" "private" {
     {
       "Name" = format("%s%s%s", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
-    }
+    },
+    var.tags
   )
 
   lifecycle {
