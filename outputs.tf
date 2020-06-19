@@ -11,6 +11,11 @@ output "public_subnet_cidrs" {
   description = "CIDR blocks of the created public subnets."
 }
 
+output "public_subnet_cidrs_ipv6" {
+  value       = aws_subnet.public.*.ipv6_cidr_block
+  description = "CIDR blocks of the created public subnets."
+}
+
 output "private_subnet_id" {
   value       = aws_subnet.private.*.id
   description = "The ID of the private subnet."
@@ -18,6 +23,11 @@ output "private_subnet_id" {
 
 output "private_subnet_cidrs" {
   value       = aws_subnet.private.*.cidr_block
+  description = "CIDR blocks of the created private subnets."
+}
+
+output "private_subnet_cidrs_ipv6" {
+  value       = aws_subnet.private.*.ipv6_cidr_block
   description = "CIDR blocks of the created private subnets."
 }
 

@@ -2,8 +2,19 @@ output "public_subnet_cidrs" {
   value       = module.subnets.public_subnet_cidrs
   description = "The CIDR of the subnet."
 }
+
+output "public_subnet_cidrs_ipv6" {
+  value       = module.subnets.public_subnet_cidrs_ipv6
+  description = "The CIDR of the subnet."
+}
+
 output "private_subnet_cidrs" {
   value       = module.subnets.private_subnet_cidrs
+  description = "The CIDR of the subnet."
+}
+
+output "private_subnet_cidrs_ipv6" {
+  value       = module.subnets.private_subnet_cidrs_ipv6
   description = "The CIDR of the subnet."
 }
 

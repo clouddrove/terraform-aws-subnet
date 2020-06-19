@@ -26,5 +26,6 @@ module "private-subnets" {
   type                = "private"
   nat_gateway_enabled = true
   cidr_block          = module.vpc.vpc_cidr_block
+  ipv6_cidr_block     = module.vpc.ipv6_cidr_block
   public_subnet_ids   = ["subnet-XXXXXXXXXXXXX", "subnet-XXXXXXXXXXXXX"]
 }
