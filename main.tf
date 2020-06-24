@@ -50,6 +50,14 @@ resource "aws_subnet" "public" {
     local.public_count + count.index
   )
 
+  ipv6_cidr_block = cidrsubnet(
+    signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
+    8,
+    local.public_count + count.index
+  )
+
+  assign_ipv6_address_on_creation = false
+
   tags = merge(
     module.public-labels.tags,
     {
@@ -87,6 +95,15 @@ resource "aws_network_acl" "public" {
     protocol   = "-1"
   }
 
+  egress {
+    rule_no         = 101
+    action          = "allow"
+    ipv6_cidr_block = "::/0"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+  }   
+
   ingress {
     rule_no    = 100
     action     = "allow"
@@ -94,6 +111,15 @@ resource "aws_network_acl" "public" {
     from_port  = 0
     to_port    = 0
     protocol   = "-1"
+  }
+
+  ingress {
+    rule_no         = 101
+    action          = "allow"
+    ipv6_cidr_block = "::/0"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
   }
 
   tags       = module.public-labels.tags
@@ -126,6 +152,15 @@ resource "aws_route" "public" {
   gateway_id             = var.igw_id
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.public]
+}
+
+resource "aws_route" "public_ipv6" {
+  count = local.public_count
+
+  route_table_id              = element(aws_route_table.public.*.id, count.index)
+  gateway_id                  = var.igw_id
+  destination_ipv6_cidr_block = "::/0"
+  depends_on                  = [aws_route_table.public]
 }
 
 #Module      : ROUTE TABLE ASSOCIATION PRIVATE
@@ -170,6 +205,14 @@ resource "aws_subnet" "private" {
     count.index
   )
 
+  ipv6_cidr_block = cidrsubnet(
+    signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
+    8,
+    count.index
+  )
+
+  assign_ipv6_address_on_creation = false
+
   tags = merge(
     module.private-labels.tags,
     {
@@ -208,6 +251,15 @@ resource "aws_network_acl" "private" {
     protocol   = "-1"
   }
 
+  egress {
+    rule_no         = 101
+    action          = "allow"
+    ipv6_cidr_block = "::/0"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+  }
+
   ingress {
     rule_no    = 100
     action     = "allow"
@@ -215,6 +267,15 @@ resource "aws_network_acl" "private" {
     from_port  = 0
     to_port    = 0
     protocol   = "-1"
+  }
+
+  ingress {
+    rule_no         = 101
+    action          = "allow"
+    ipv6_cidr_block = "::/0"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
   }
 
   tags       = module.private-labels.tags
