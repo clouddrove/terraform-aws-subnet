@@ -36,7 +36,7 @@ usage : |-
   ### Private Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.5"
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -46,6 +46,7 @@ usage : |-
       type                = "private"
       nat_gateway_enabled = true
       cidr_block          = "10.0.0.0/16"
+      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
       public_subnet_ids   = ["subnet-XXXXXXXXXXXXX", "subnet-XXXXXXXXXXXXX"]
     }
   ```
@@ -53,7 +54,7 @@ usage : |-
   ### Public-Private Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.5"
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -64,13 +65,14 @@ usage : |-
       igw_id              = "ig-xxxxxxxxx"
       nat_gateway_enabled = true
       cidr_block          = "10.0.0.0/16"
+      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
     }
   ```
 
   ### Public Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.5"
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -80,5 +82,6 @@ usage : |-
       type                = "public"
       igw_id              = "ig-xxxxxxxxx"
       cidr_block          = "10.0.0.0/16"
+      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
     }
   ```
