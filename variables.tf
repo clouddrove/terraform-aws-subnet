@@ -162,3 +162,9 @@ variable "traffic_type" {
   default     = "ALL"
   description = "Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL."
 }
+
+variable "map_public_ip_on_launch" {
+  type        = bool
+  default     = false
+  description = "Specify true to indicate that instances launched into the subnet should be assigned a public IP address."
+}

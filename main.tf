@@ -55,7 +55,7 @@ resource "aws_subnet" "public" {
     8,
     local.public_count + count.index
   )
-
+  map_public_ip_on_launch = var.map_public_ip_on_launch
   assign_ipv6_address_on_creation = false
 
   tags = merge(

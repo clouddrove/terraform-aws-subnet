@@ -72,7 +72,7 @@ Here are some examples of how you can use this module in your inventory structur
 ### Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -90,7 +90,7 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public-Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -108,7 +108,7 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
+    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -147,6 +147,7 @@ Here are some examples of how you can use this module in your inventory structur
 | label\_order | Label order, e.g. `name`,`application`. | list | `<list>` | no |
 | managedby | ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'. | string | `"anmol@clouddrove.com"` | no |
 | map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | bool | `"true"` | no |
+| map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | bool | `"false"` | no |
 | max\_subnets | Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation. | number | `"6"` | no |
 | name | Name  \(e.g. `app` or `cluster`\). | string | `""` | no |
 | nat\_gateway\_enabled | Flag to enable/disable NAT Gateways creation in public subnets. | bool | `"false"` | no |

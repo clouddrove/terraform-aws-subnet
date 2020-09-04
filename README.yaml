@@ -36,7 +36,7 @@ usage : |-
   ### Private Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -54,7 +54,7 @@ usage : |-
   ### Public-Private Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -72,7 +72,7 @@ usage : |-
   ### Public Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.7"
+      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
