@@ -43,7 +43,7 @@ jobs:
             go get -v -t -d ./...
           fi
       - name: Test
-        working-directory: ./_test./public-subnet
+        working-directory: ./_test/public-subnet
         run: go test
 
       - name: 'Terraform Init'
