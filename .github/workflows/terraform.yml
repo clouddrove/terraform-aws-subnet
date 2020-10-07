@@ -16,7 +16,7 @@ jobs:
         with:
           tf_actions_version: 0.13.3
           tf_actions_subcommand: 'fmt'
-          tf_actions_working_dir: "./_example/public-subnet"
+          tf_actions_working_dir: ./_example/public-subnet
           tf_actions_comment: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +51,7 @@ jobs:
         with:
           tf_actions_version: 0.13.3
           tf_actions_subcommand: 'init'
-          tf_actions_working_dir: "./_example/public-subnet"
+          tf_actions_working_dir: ./_example/public-subnet
           tf_actions_comment: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
