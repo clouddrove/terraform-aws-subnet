@@ -3,8 +3,8 @@ provider "aws" {
 }
 
 module "vpc" {
-  source              = "clouddrove/vpc/aws"
-  version             = "0.13.0"
+  source  = "clouddrove/vpc/aws"
+  version = "0.13.0"
 
   name        = "vpc"
   application = "clouddrove"
