@@ -21,33 +21,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terratest Public_subnet'
+      - name: 'Terratest'
         if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@master'
+        uses: 'clouddrove/github-actions@v4.0'
         with:
           actions_subcommand: 'terratest'
-          tf_actions_working_dir: ./_test/public-subnet
+          tf_actions_working_dir: ./_test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 'Terratest Public-private-Subnet'
-        if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@master'
-        with:
-          actions_subcommand: 'terratest'
-          tf_actions_working_dir: ./_test/public-private-subnet
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: 'Terratest Private-Subnet'
-        if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@master'
-        with:
-          actions_subcommand: 'terratest'
-          tf_actions_working_dir: ./_test/private-subnet
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: 'Slack Notification'
         uses: clouddrove/action-slack@v2

@@ -1,6 +1,6 @@
 name: 'Create README.md file'
 on:
-  pull_request:
+  push:
     branches:
       - master
 
@@ -18,8 +18,7 @@ jobs:
           python-version: '3.x'
 
       - name: 'create readme'
-        if: github.event.label.name == 'ep'
-        uses: 'clouddrove/github-actions@master'
+        uses: 'clouddrove/github-actions@v4.0'
         with:
           actions_subcommand: 'readme'
           github_token: '${{ secrets.GITHUB}}'
@@ -36,7 +35,8 @@ jobs:
         continue-on-error: true
 
       - name: 'push readme'
-        uses: 'clouddrove/github-actions@master'
+        uses: 'clouddrove/github-actions@v4.0'
+        continue-on-error: true
         with:
           actions_subcommand: 'push'
         env:
