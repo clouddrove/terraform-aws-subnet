@@ -7,14 +7,14 @@
     Terraform AWS Subnet
 </h1>
 
-<p align="center" style="font-size: 1.2rem;">
+<p align="center" style="font-size: 1.2rem;"> 
     Terraform module to create public, private and public-private subnet with network acl, route table, Elastic IP, nat gateway, flow log.
      </p>
 
 <p align="center">
 
 <a href="https://www.terraform.io">
-  <img src="https://img.shields.io/badge/Terraform-v0.12-green" alt="Terraform">
+  <img src="https://img.shields.io/badge/Terraform-v0.13-green" alt="Terraform">
 </a>
 <a href="LICENSE.md">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="Licence">
@@ -38,7 +38,7 @@
 <hr>
 
 
-We eat, drink, sleep and most importantly love **DevOps**. We are working towards strategies for standardizing architecture while ensuring security for the infrastructure. We are strong believer of the philosophy <b>Bigger problems are always solved by breaking them into smaller manageable problems</b>. Resonating with microservices architecture, it is considered best-practice to run database, cluster, storage in smaller <b>connected yet manageable pieces</b> within the infrastructure.
+We eat, drink, sleep and most importantly love **DevOps**. We are working towards strategies for standardizing architecture while ensuring security for the infrastructure. We are strong believer of the philosophy <b>Bigger problems are always solved by breaking them into smaller manageable problems</b>. Resonating with microservices architecture, it is considered best-practice to run database, cluster, storage in smaller <b>connected yet manageable pieces</b> within the infrastructure. 
 
 This module is basically combination of [Terraform open source](https://www.terraform.io/) and includes automatation tests and examples. It also helps to create and improve your infrastructure with minimalistic code instead of maintaining the whole infrastructure code yourself.
 
@@ -49,9 +49,9 @@ We have [*fifty plus terraform modules*][terraform_modules]. A few of them are c
 
 ## Prerequisites
 
-This module has a few dependencies:
+This module has a few dependencies: 
 
-- [Terraform 0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Terraform 0.13](https://learn.hashicorp.com/terraform/getting-started/install.html)
 - [Go](https://golang.org/doc/install)
 - [github.com/stretchr/testify/assert](https://github.com/stretchr/testify)
 - [github.com/gruntwork-io/terratest/modules/terraform](https://github.com/gruntwork-io/terratest)
@@ -72,7 +72,8 @@ Here are some examples of how you can use this module in your inventory structur
 ### Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
+    source              = "clouddrove/terraform-aws-subnet/aws"
+    version             = "0.13.0"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -90,7 +91,8 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public-Private Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
+    source              = "clouddrove/terraform-aws-subnet/aws"
+    version             = "0.13.0"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -108,7 +110,8 @@ Here are some examples of how you can use this module in your inventory structur
 ### Public Subnet
 ```hcl
   module "subnets" {
-    source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
+    source              = "clouddrove/terraform-aws-subnet/aws"
+    version             = "0.13.0"
     name                = "subnets"
     application         = "clouddrove"
     environment         = "test"
@@ -130,35 +133,34 @@ Here are some examples of how you can use this module in your inventory structur
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|:----:|:-----:|:-----:|
-| application | Application \(e.g. `cd` or `clouddrove`\). | string | `""` | no |
-| attributes | Additional attributes \(e.g. `1`\). | list | `<list>` | no |
-| availability\_zones | List of Availability Zones \(e.g. `\['us-east-1a', 'us-east-1b', 'us-east-1c'\]`\). | list(string) | `<list>` | no |
-| az\_ngw\_count | Count of items in the `az\_ngw\_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857. | number | `"0"` | no |
-| az\_ngw\_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets. | map(string) | `<map>` | no |
-| cidr\_block | Base CIDR block which is divided into subnet CIDR blocks \(e.g. `10.0.0.0/16`\). | string | n/a | yes |
-| delimiter | Delimiter to be used between `organization`, `environment`, `name` and `attributes`. | string | `"-"` | no |
-| enable\_acl | Set to false to prevent the module from creating any resources. | bool | `"true"` | no |
-| enable\_flow\_log | Enable subnet\_flow\_log logs. | bool | `"false"` | no |
-| enabled | Set to false to prevent the module from creating any resources. | bool | `"true"` | no |
-| environment | Environment \(e.g. `prod`, `dev`, `staging`\). | string | `""` | no |
-| igw\_id | Internet Gateway ID that is used as a default route when creating public subnets \(e.g. `igw-9c26a123`\). | string | `""` | no |
-| ipv6\_cidr\_block | Base CIDR block which is divided into subnet CIDR blocks \(e.g. `10.0.0.0/16`\). | string | n/a | yes |
-| label\_order | Label order, e.g. `name`,`application`. | list | `<list>` | no |
-| managedby | ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'. | string | `"anmol@clouddrove.com"` | no |
-| map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | bool | `"true"` | no |
-| map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | bool | `"false"` | no |
-| max\_subnets | Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation. | number | `"6"` | no |
-| name | Name  \(e.g. `app` or `cluster`\). | string | `""` | no |
-| nat\_gateway\_enabled | Flag to enable/disable NAT Gateways creation in public subnets. | bool | `"false"` | no |
-| private\_network\_acl\_id | Network ACL ID that is added to the private subnets. If empty, a new ACL will be created. | string | `""` | no |
-| public\_network\_acl\_id | Network ACL ID that is added to the public subnets. If empty, a new ACL will be created. | string | `""` | no |
-| public\_subnet\_ids | A list of public subnet ids. | list(string) | `<list>` | no |
-| s3\_bucket\_arn | S3 ARN for vpc logs. | string | `""` | no |
-| tags | Additional tags \(e.g. map\(`BusinessUnit`,`XYZ`\). | map | `<map>` | no |
-| traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | string | `"ALL"` | no |
-| type | Type of subnets to create \(`private` or `public`\). | string | `""` | no |
-| vpc\_id | VPC ID. | string | n/a | yes |
+|------|-------------|------|---------|:--------:|
+| application | Application (e.g. `cd` or `clouddrove`). | `string` | `""` | no |
+| attributes | Additional attributes (e.g. `1`). | `list` | `[]` | no |
+| availability\_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`). | `list(string)` | `[]` | no |
+| az\_ngw\_count | Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857. | `number` | `0` | no |
+| az\_ngw\_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets. | `map(string)` | `{}` | no |
+| cidr\_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`). | `string` | n/a | yes |
+| delimiter | Delimiter to be used between `organization`, `environment`, `name` and `attributes`. | `string` | `"-"` | no |
+| enable\_acl | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
+| enable\_flow\_log | Enable subnet\_flow\_log logs. | `bool` | `false` | no |
+| enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
+| environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
+| igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`). | `string` | `""` | no |
+| ipv6\_cidr\_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`). | `string` | n/a | yes |
+| label\_order | Label order, e.g. `name`,`application`. | `list` | `[]` | no |
+| managedby | ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'. | `string` | `"anmol@clouddrove.com"` | no |
+| map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | `bool` | `true` | no |
+| max\_subnets | Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation. | `number` | `6` | no |
+| name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
+| nat\_gateway\_enabled | Flag to enable/disable NAT Gateways creation in public subnets. | `bool` | `false` | no |
+| private\_network\_acl\_id | Network ACL ID that is added to the private subnets. If empty, a new ACL will be created. | `string` | `""` | no |
+| public\_network\_acl\_id | Network ACL ID that is added to the public subnets. If empty, a new ACL will be created. | `string` | `""` | no |
+| public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
+| s3\_bucket\_arn | S3 ARN for vpc logs. | `string` | `""` | no |
+| tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map` | `{}` | no |
+| traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | `string` | `"ALL"` | no |
+| type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
+| vpc\_id | VPC ID. | `string` | n/a | yes |
 
 ## Outputs
 
@@ -179,7 +181,7 @@ Here are some examples of how you can use this module in your inventory structur
 
 
 ## Testing
-In this module testing is performed with [terratest](https://github.com/gruntwork-io/terratest) and it creates a small piece of infrastructure, matches the output like ARN, ID and Tags name etc and destroy infrastructure in your AWS account. This testing is written in GO, so you need a [GO environment](https://golang.org/doc/install) in your system.
+In this module testing is performed with [terratest](https://github.com/gruntwork-io/terratest) and it creates a small piece of infrastructure, matches the output like ARN, ID and Tags name etc and destroy infrastructure in your AWS account. This testing is written in GO, so you need a [GO environment](https://golang.org/doc/install) in your system. 
 
 You need to run the following command in the testing folder:
 ```hcl
@@ -188,7 +190,7 @@ You need to run the following command in the testing folder:
 
 
 
-## Feedback
+## Feedback 
 If you come accross a bug or have any feedback, please log it in our [issue tracker](https://github.com/clouddrove/terraform-aws-subnet/issues), or feel free to drop us an email at [hello@clouddrove.com](mailto:hello@clouddrove.com).
 
 If you have found it worth your time, go ahead and give us a ★ on [our GitHub](https://github.com/clouddrove/terraform-aws-subnet)!
