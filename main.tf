@@ -14,7 +14,7 @@ locals {
 #              tags for resources. You can use terraform-labels to implement a strict
 #              naming convention.
 module "private-labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.12.0"
+  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
 
   name        = var.name
   application = var.application
@@ -25,7 +25,7 @@ module "private-labels" {
 }
 
 module "public-labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.12.0"
+  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
 
   name        = var.name
   application = var.application
@@ -55,7 +55,7 @@ resource "aws_subnet" "public" {
     8,
     local.public_count + count.index
   )
-  map_public_ip_on_launch = var.map_public_ip_on_launch
+  map_public_ip_on_launch         = var.map_public_ip_on_launch
   assign_ipv6_address_on_creation = false
 
   tags = merge(
@@ -102,7 +102,7 @@ resource "aws_network_acl" "public" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-  }   
+  }
 
   ingress {
     rule_no    = 100

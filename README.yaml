@@ -5,7 +5,7 @@
 #
 
 # Name of this project
-name : Terraform AWS Subnet
+name: Terraform AWS Subnet
 
 # License of this project
 license: "MIT"
@@ -16,7 +16,7 @@ github_repo: clouddrove/terraform-aws-subnet
 # Badges to display
 badges:
   - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v0.12-green"
+    image: "https://img.shields.io/badge/Terraform-v0.13-green"
     url: "https://www.terraform.io"
   - name: "Licence"
     image: "https://img.shields.io/badge/License-MIT-blue.svg"
@@ -31,12 +31,13 @@ include:
   - "terraform.md"
 
 # How to use this project
-usage : |-
+usage: |-
   Here are some examples of how you can use this module in your inventory structure:
   ### Private Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
+      source              = "clouddrove/terraform-aws-subnet/aws"
+      version             = "0.13.0"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -54,7 +55,8 @@ usage : |-
   ### Public-Private Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
+      source              = "clouddrove/terraform-aws-subnet/aws"
+      version             = "0.13.0"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
@@ -72,7 +74,8 @@ usage : |-
   ### Public Subnet
   ```hcl
     module "subnets" {
-      source              = "git::https://github.com/clouddrove/terraform-aws-subnet.git?ref=tags/0.12.8"
+      source              = "clouddrove/terraform-aws-subnet/aws"
+      version             = "0.13.0"
       name                = "subnets"
       application         = "clouddrove"
       environment         = "test"
