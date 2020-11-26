@@ -5,7 +5,7 @@
 
 locals {
   public_count               = var.enabled == true && var.type == "public" || var.type == "public-private" ? length(var.availability_zones) : 0
-  private_nat_gateways_count = var.enabled == true && var.type == "private" || var.type == "public-private" && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
+  private_nat_gateways_count = var.enabled == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
   private_count              = var.enabled == true && var.type == "private" || var.type == "public-private" ? length(var.availability_zones) : 0
 }
 
@@ -44,17 +44,17 @@ resource "aws_subnet" "public" {
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
 
-  cidr_block = cidrsubnet(
+  cidr_block = length(var.ipv4_cidrs) == 0 ? cidrsubnet(
     signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
     ceil(log(local.public_count * 2, 2)),
     local.public_count + count.index
-  )
+  ) : var.ipv4_cidrs[count.index]
 
-  ipv6_cidr_block = cidrsubnet(
+  ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
     signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
     8,
     local.public_count + count.index
-  )
+  ) : var.ipv6_cidrs[count.index]
   map_public_ip_on_launch = var.map_public_ip_on_launch
   assign_ipv6_address_on_creation = false
 
@@ -199,17 +199,17 @@ resource "aws_subnet" "private" {
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
 
-  cidr_block = cidrsubnet(
+  cidr_block = length(var.ipv4_cidrs) == 0 ? cidrsubnet(
     signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
     local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)),
     count.index
-  )
+  ) : var.ipv4_cidrs[count.index]
 
-  ipv6_cidr_block = cidrsubnet(
+  ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
     signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
     8,
     count.index
-  )
+  ) : var.ipv6_cidrs[count.index]
 
   assign_ipv6_address_on_creation = false
 

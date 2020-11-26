@@ -78,6 +78,18 @@ variable "cidr_block" {
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
 }
 
+variable "ipv6_cidrs" {
+  type        = list
+  default     = []
+  description = "Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
+}
+
+variable "ipv4_cidrs" {
+  type        = list
+  default     = []
+  description = "Subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+}
+
 variable "ipv6_cidr_block" {
   type        = string
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
