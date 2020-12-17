@@ -4,9 +4,9 @@
 
 
 locals {
-  public_count               = var.enabled == true && var.type == "public" || var.type == "public-private" ? length(var.availability_zones) : 0
+  public_count               = var.enabled == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_nat_gateways_count = var.enabled == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
-  private_count              = var.enabled == true && var.type == "private" || var.type == "public-private" ? length(var.availability_zones) : 0
+  private_count              = var.enabled == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
 }
 
 #Module      : label
