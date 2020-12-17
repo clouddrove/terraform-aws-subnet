@@ -81,7 +81,7 @@ resource "aws_subnet" "public" {
 #              similar to your security groups in order to add an additional layer of
 #              security to your VPC.
 resource "aws_network_acl" "public" {
-  count = var.enable_acl == true && var.type == "public" || var.type == "public-private" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
+  count = var.enable_acl == true && (var.type == "public" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
 
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.public.*.id
@@ -237,7 +237,7 @@ resource "aws_subnet" "private" {
 #              similar to your security groups in order to add an additional layer of
 #              security to your VPC.
 resource "aws_network_acl" "private" {
-  count = var.enable_acl == true && var.type == "private" || var.type == "public-private" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
+  count = var.enable_acl == true && (var.type == "private" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
 
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
