@@ -20,60 +20,60 @@ jobs:
           aws-region: us-east-2
 
       - name: 'Terraform Format'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'fmt'
 
       - name: 'Terraform init Public-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-subnet
 
       - name: 'Terraform validate Public-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/public-subnet
 
       - name: 'Terraform plan Public-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/public-subnet
 
       - name: 'Terraform init Private-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/private-subnet
 
       - name: 'Terraform validate Private-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/private-subnet
 
       - name: 'Terraform plan Private-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/private-subnet
 
       - name: 'Terraform init Public-Private-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-private-subnet
 
       - name: 'Terraform validate Public-Private-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/public-private-subnet
 
       - name: 'Terraform plan Public-Private-subnet'
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v6.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/public-private-subnet

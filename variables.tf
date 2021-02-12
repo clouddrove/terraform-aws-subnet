@@ -6,10 +6,16 @@ variable "name" {
   description = "Name  (e.g. `app` or `cluster`)."
 }
 
-variable "application" {
+variable "repository" {
   type        = string
   default     = ""
-  description = "Application (e.g. `cd` or `clouddrove`)."
+  description = "Terraform current module repo"
+
+  validation {
+    # regex(...) fails if it cannot find a match
+    condition     = can(regex("^https://", var.repository))
+    error_message = "The module-repo value must be a valid Git repo link."
+  }
 }
 
 variable "environment" {
@@ -19,13 +25,13 @@ variable "environment" {
 }
 
 variable "label_order" {
-  type        = list
+  type        = list(any)
   default     = []
   description = "Label order, e.g. `name`,`application`."
 }
 
 variable "attributes" {
-  type        = list
+  type        = list(any)
   default     = []
   description = "Additional attributes (e.g. `1`)."
 }
@@ -37,15 +43,15 @@ variable "delimiter" {
 }
 
 variable "tags" {
-  type        = map
+  type        = map(any)
   default     = {}
   description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
 }
 
 variable "managedby" {
   type        = string
-  default     = "anmol@clouddrove.com"
-  description = "ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'."
+  default     = "hello@clouddrove.com"
+  description = "ManagedBy, eg 'CloudDrove'."
 }
 
 #Module      : SUBNET
@@ -71,11 +77,13 @@ variable "type" {
 variable "vpc_id" {
   type        = string
   description = "VPC ID."
+  sensitive   = true
 }
 
 variable "cidr_block" {
   type        = string
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+
 }
 
 variable "ipv6_cidr_block" {
@@ -87,30 +95,40 @@ variable "public_subnet_ids" {
   type        = list(string)
   default     = []
   description = "A list of public subnet ids."
+  sensitive   = true
+
 }
 
 variable "igw_id" {
   type        = string
   default     = ""
   description = "Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`)."
+  sensitive   = true
+
 }
 
 variable "az_ngw_ids" {
   type        = map(string)
   default     = {}
   description = "Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets."
+  sensitive   = true
+
 }
 
 variable "public_network_acl_id" {
   type        = string
   default     = ""
   description = "Network ACL ID that is added to the public subnets. If empty, a new ACL will be created."
+  sensitive   = true
+
 }
 
 variable "private_network_acl_id" {
   type        = string
   default     = ""
   description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created."
+  sensitive   = true
+
 }
 
 variable "enabled" {
@@ -155,10 +173,23 @@ variable "s3_bucket_arn" {
   type        = string
   default     = ""
   description = "S3 ARN for vpc logs."
+  sensitive   = true
 }
 
 variable "traffic_type" {
   type        = string
   default     = "ALL"
   description = "Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL."
+}
+
+variable "ipv6_cidrs" {
+  type        = list(any)
+  default     = []
+  description = "Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
+}
+
+variable "ipv4_cidrs" {
+  type        = list(any)
+  default     = []
+  description = "Subnet CIDR blocks (e.g. `10.0.0.0/16`)."
 }

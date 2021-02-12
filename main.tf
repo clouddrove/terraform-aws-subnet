@@ -4,9 +4,9 @@
 
 
 locals {
-  public_count               = var.enabled == true && var.type == "public" || var.type == "public-private" ? length(var.availability_zones) : 0
-  private_nat_gateways_count = var.enabled == true && var.type == "private" || var.type == "public-private" && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
-  private_count              = var.enabled == true && var.type == "private" || var.type == "public-private" ? length(var.availability_zones) : 0
+  public_count               = var.enabled == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
+  private_nat_gateways_count = var.enabled == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
+  private_count              = var.enabled == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
 }
 
 #Module      : label
@@ -14,10 +14,10 @@ locals {
 #              tags for resources. You can use terraform-labels to implement a strict
 #              naming convention.
 module "private-labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
+  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.14.0"
 
   name        = var.name
-  application = var.application
+  repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
@@ -25,10 +25,10 @@ module "private-labels" {
 }
 
 module "public-labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
+  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.14.0"
 
   name        = var.name
-  application = var.application
+  repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
@@ -44,17 +44,17 @@ resource "aws_subnet" "public" {
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
 
-  cidr_block = cidrsubnet(
+  cidr_block = length(var.ipv4_cidrs) == 0 ? cidrsubnet(
     signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
     ceil(log(local.public_count * 2, 2)),
     local.public_count + count.index
-  )
+  ) : var.ipv4_cidrs[count.index]
 
-  ipv6_cidr_block = cidrsubnet(
+  ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
     signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
     8,
     local.public_count + count.index
-  )
+  ) : var.ipv6_cidrs[count.index]
   map_public_ip_on_launch         = var.map_public_ip_on_launch
   assign_ipv6_address_on_creation = false
 
@@ -81,7 +81,7 @@ resource "aws_subnet" "public" {
 #              similar to your security groups in order to add an additional layer of
 #              security to your VPC.
 resource "aws_network_acl" "public" {
-  count = var.enable_acl == true && var.type == "public" || var.type == "public-private" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
+  count = var.enabled == true && var.enable_acl == true && (var.type == "public" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
 
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.public.*.id
@@ -182,7 +182,7 @@ resource "aws_route_table_association" "public" {
 #              network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group
 #              or a S3 Bucket.
 resource "aws_flow_log" "flow_log" {
-  count = var.enable_flow_log == true ? 1 : 0
+  count = var.enabled == true && var.enable_flow_log == true ? 1 : 0
 
   log_destination      = var.s3_bucket_arn
   log_destination_type = "s3"
@@ -199,17 +199,17 @@ resource "aws_subnet" "private" {
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
 
-  cidr_block = cidrsubnet(
+  cidr_block = length(var.ipv4_cidrs) == 0 ? cidrsubnet(
     signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
     local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)),
     count.index
-  )
+  ) : var.ipv4_cidrs[count.index]
 
-  ipv6_cidr_block = cidrsubnet(
+  ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
     signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
     8,
     count.index
-  )
+  ) : var.ipv6_cidrs[count.index]
 
   assign_ipv6_address_on_creation = false
 
@@ -237,7 +237,7 @@ resource "aws_subnet" "private" {
 #              similar to your security groups in order to add an additional layer of
 #              security to your VPC.
 resource "aws_network_acl" "private" {
-  count = var.enable_acl == true && var.type == "private" || var.type == "public-private" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
+  count = var.enabled == true && var.enable_acl == true && (var.type == "private" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
 
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
@@ -356,7 +356,7 @@ resource "aws_nat_gateway" "private" {
 #              network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group
 #              or a S3 Bucket.
 resource "aws_flow_log" "private_subnet_flow_log" {
-  count                = var.enable_flow_log == true ? 1 : 0
+  count                = var.enabled == true && var.enable_flow_log == true ? 1 : 0
   log_destination      = var.s3_bucket_arn
   log_destination_type = "s3"
   traffic_type         = var.traffic_type
