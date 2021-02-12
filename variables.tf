@@ -174,13 +174,6 @@ variable "s3_bucket_arn" {
   default     = ""
   description = "S3 ARN for vpc logs."
   sensitive   = true
-  validation {
-    # regex(...) fails if it cannot find a match
-    condition     = can(regex("^arn:", var.s3_bucket_arn))
-    error_message = "The s3_bucket_arn value must be a valid s3 arn."
-  }
-
-
 }
 
 variable "traffic_type" {
