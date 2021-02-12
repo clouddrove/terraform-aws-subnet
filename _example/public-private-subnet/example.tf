@@ -7,9 +7,9 @@ module "vpc" {
   version = "0.13.0"
 
   name        = "vpc"
-  application = "clouddrove"
+  repository  = "https://registry.terraform.io/modules/clouddrove/vpc/aws/0.14.0"
   environment = "test"
-  label_order = ["environment", "application", "name"]
+  label_order = ["name", "environment"]
 
   cidr_block = "10.0.0.0/16"
 }
@@ -18,9 +18,9 @@ module "subnets" {
   source = "./../../"
 
   name        = "subnets"
-  application = "clouddrove"
+  repository  = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
   environment = "test"
-  label_order = ["environment", "application", "name"]
+  label_order = ["name", "environment"]
 
   availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id              = module.vpc.vpc_id

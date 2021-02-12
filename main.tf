@@ -17,7 +17,7 @@ module "private-labels" {
   source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
 
   name        = var.name
-  application = var.application
+  repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
@@ -28,7 +28,7 @@ module "public-labels" {
   source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.13.0"
 
   name        = var.name
-  application = var.application
+  repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
