@@ -162,3 +162,15 @@ variable "traffic_type" {
   default     = "ALL"
   description = "Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL."
 }
+
+variable "ipv6_cidrs" {
+  type        = list
+  default     = []
+  description = "Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
+}
+
+variable "ipv4_cidrs" {
+  type        = list
+  default     = []
+  description = "Subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+}
