@@ -14,7 +14,7 @@
 <p align="center">
 
 <a href="https://www.terraform.io">
-  <img src="https://img.shields.io/badge/Terraform-v0.13-green" alt="Terraform">
+  <img src="https://img.shields.io/badge/Terraform-v0.14-green" alt="Terraform">
 </a>
 <a href="LICENSE.md">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="Licence">
@@ -73,11 +73,11 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.13.0"
+    version             = "0.14.0"
     name                = "subnets"
-    application         = "clouddrove"
+    repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
     environment         = "test"
-    label_order         = ["environment", "name", "application"]
+    label_order         = ["name", "environment"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "private"
@@ -92,11 +92,11 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.13.0"
+    version             = "0.14.0"
     name                = "subnets"
-    application         = "clouddrove"
+    repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
     environment         = "test"
-    label_order         = ["environment", "name", "application"]
+    label_order         = ["name", "environment"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "public-private"
@@ -111,11 +111,11 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.13.0"
+    version             = "0.14.0"
     name                = "subnets"
-    application         = "clouddrove"
+    repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
     environment         = "test"
-    label_order         = ["environment", "name", "application"]
+    label_order         = ["name", "environment"]
     availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "public"
@@ -134,8 +134,7 @@ Here are some examples of how you can use this module in your inventory structur
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| application | Application (e.g. `cd` or `clouddrove`). | `string` | `""` | no |
-| attributes | Additional attributes (e.g. `1`). | `list` | `[]` | no |
+| attributes | Additional attributes (e.g. `1`). | `list(any)` | `[]` | no |
 | availability\_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`). | `list(string)` | `[]` | no |
 | az\_ngw\_count | Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857. | `number` | `0` | no |
 | az\_ngw\_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets. | `map(string)` | `{}` | no |
@@ -146,9 +145,11 @@ Here are some examples of how you can use this module in your inventory structur
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`). | `string` | `""` | no |
+| ipv4\_cidrs | Subnet CIDR blocks (e.g. `10.0.0.0/16`). | `list(any)` | `[]` | no |
 | ipv6\_cidr\_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`). | `string` | n/a | yes |
-| label\_order | Label order, e.g. `name`,`application`. | `list` | `[]` | no |
-| managedby | ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'. | `string` | `"anmol@clouddrove.com"` | no |
+| ipv6\_cidrs | Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`). | `list(any)` | `[]` | no |
+| label\_order | Label order, e.g. `name`,`application`. | `list(any)` | `[]` | no |
+| managedby | ManagedBy, eg 'CloudDrove'. | `string` | `"hello@clouddrove.com"` | no |
 | map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | `bool` | `true` | no |
 | max\_subnets | Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation. | `number` | `6` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
@@ -156,8 +157,9 @@ Here are some examples of how you can use this module in your inventory structur
 | private\_network\_acl\_id | Network ACL ID that is added to the private subnets. If empty, a new ACL will be created. | `string` | `""` | no |
 | public\_network\_acl\_id | Network ACL ID that is added to the public subnets. If empty, a new ACL will be created. | `string` | `""` | no |
 | public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
+| repository | Terraform current module repo | `string` | `""` | no |
 | s3\_bucket\_arn | S3 ARN for vpc logs. | `string` | `""` | no |
-| tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map` | `{}` | no |
+| tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(any)` | `{}` | no |
 | traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | `string` | `"ALL"` | no |
 | type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
 | vpc\_id | VPC ID. | `string` | n/a | yes |
