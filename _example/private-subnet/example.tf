@@ -20,7 +20,7 @@ module "private-subnets" {
   name        = "subnets"
   repository  = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
   environment = "test"
-  label_order = ["name", "environment"]
+  label_order = ["name", "environment","attributes"]
 
   availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id              = module.vpc.vpc_id

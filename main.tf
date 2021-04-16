@@ -14,25 +14,27 @@ locals {
 #              tags for resources. You can use terraform-labels to implement a strict
 #              naming convention.
 module "private-labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.14.0"
+  source = "git::https://github.com/clouddrove-sandbox/terraform-labels.git?ref=label-improvements"
 
   name        = var.name
   repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
-  attributes  = compact(concat(var.attributes, list("private")))
+  attributes  = compact(concat(var.attributes, ["private"]))
+  tags        = var.additional_tags
 }
 
 module "public-labels" {
-  source = "git::https://github.com/clouddrove/terraform-labels.git?ref=tags/0.14.0"
+  source = "git::https://github.com/clouddrove-sandbox/terraform-labels.git?ref=label-improvements"
 
   name        = var.name
   repository  = var.repository
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
-  attributes  = compact(concat(var.attributes, list("public")))
+  attributes  = compact(concat(var.attributes, ["public"]))
+  tags        = var.additional_tags
 }
 
 #Module      : PUBLIC SUBNET
@@ -317,6 +319,11 @@ resource "aws_route" "nat_gateway" {
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = element(aws_nat_gateway.private.*.id, count.index)
   depends_on             = [aws_route_table.private]
+
+  timeouts {
+    create = var.aws_route_create_timeout
+    delete = var.aws_route_delete_timeout
+  }
 }
 
 #Module      : EIP
