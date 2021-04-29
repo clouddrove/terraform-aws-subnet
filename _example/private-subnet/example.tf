@@ -18,7 +18,7 @@ module "private-subnets" {
   source = "./../../"
 
   name        = "subnets"
-  repository  = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
+  repository  = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
   environment = "test"
   label_order = ["name", "environment"]
 

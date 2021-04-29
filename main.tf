@@ -21,7 +21,7 @@ module "private-labels" {
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
-  attributes  = compact(concat(var.attributes, list("private")))
+  attributes  = compact(concat(var.attributes, ["private"]))
 }
 
 module "public-labels" {
@@ -32,7 +32,7 @@ module "public-labels" {
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
-  attributes  = compact(concat(var.attributes, list("public")))
+  attributes  = compact(concat(var.attributes, ["public"]))
 }
 
 #Module      : PUBLIC SUBNET
