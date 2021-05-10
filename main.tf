@@ -189,10 +189,10 @@ resource "aws_flow_log" "flow_log" {
   traffic_type         = var.traffic_type
   subnet_id            = element(aws_subnet.public.*.id, count.index)
   tags = merge(
-  module.public-labels.tags,
-  {
-    "Name" = format("%s-flowlog", module.public-labels.name)
-  }
+    module.public-labels.tags,
+    {
+      "Name" = format("%s-flowlog", module.public-labels.name)
+    }
   )
 }
 
@@ -368,9 +368,9 @@ resource "aws_flow_log" "private_subnet_flow_log" {
   traffic_type         = var.traffic_type
   subnet_id            = element(aws_subnet.private.*.id, count.index)
   tags = merge(
-  module.private-labels.tags,
-  {
-    "Name" = format("%s-flowlog", module.private-labels.name)
-  }
+    module.private-labels.tags,
+    {
+      "Name" = format("%s-flowlog", module.private-labels.name)
+    }
   )
 }
