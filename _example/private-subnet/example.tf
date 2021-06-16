@@ -4,7 +4,7 @@ provider "aws" {
 
 module "vpc" {
   source  = "clouddrove/vpc/aws"
-  version = "0.14.0"
+  version = "0.15.0"
 
   name        = "vpc"
   repository  = "https://registry.terraform.io/modules/clouddrove/vpc/aws/0.14.0"
