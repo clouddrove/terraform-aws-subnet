@@ -16,7 +16,7 @@ github_repo: clouddrove/terraform-aws-subnet
 # Badges to display
 badges:
   - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v0.14-green"
+    image: "https://img.shields.io/badge/Terraform-v0.15-green"
     url: "https://www.terraform.io"
   - name: "Licence"
     image: "https://img.shields.io/badge/License-MIT-blue.svg"
@@ -37,9 +37,9 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.14.0"
+      version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
+      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -56,9 +56,9 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.14.0"
+      version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
+      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -75,9 +75,9 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.14.0"
+      version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.14.0"
+      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
