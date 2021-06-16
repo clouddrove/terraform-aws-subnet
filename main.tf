@@ -59,7 +59,7 @@ resource "aws_subnet" "public" {
   assign_ipv6_address_on_creation = false
 
   tags = merge(
-    module.public-labels.tags,
+    module.public-labels.tags, var.tags,
     {
       "Name" = format("%s%s%s", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
