@@ -157,7 +157,7 @@ Here are some examples of how you can use this module in your inventory structur
 | private\_network\_acl\_id | Network ACL ID that is added to the private subnets. If empty, a new ACL will be created. | `string` | `""` | no |
 | public\_network\_acl\_id | Network ACL ID that is added to the public subnets. If empty, a new ACL will be created. | `string` | `""` | no |
 | public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
-| repository | Terraform current module repo | `string` | `""` | no |
+| repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-subnet"` | no |
 | s3\_bucket\_arn | S3 ARN for vpc logs. | `string` | `""` | no |
 | tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(any)` | `{}` | no |
 | traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | `string` | `"ALL"` | no |
