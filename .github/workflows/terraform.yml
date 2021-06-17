@@ -3,23 +3,22 @@ on:
   pull_request:
     branches:
       - master
-
-  terraform:
-    name: 'Terraform'
+jobs:
+  fmt:
+    name: 'terraform fmt'
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@master
+        uses: actions/checkout@v2.3.4
 
-      - name: Configure AWS Credentials
-        uses: clouddrove/configure-aws-credentials@v1
+      - name: 'Terraform Format'
+        uses: 'clouddrove/github-actions@v7.0'
         with:
-          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
-          aws-region: us-east-2
+          actions_subcommand: 'fmt'
 
-  validate:
-    name: 'terraform validate'
+  private:
+    name: 'private'
+    needs: fmt
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
@@ -32,45 +31,32 @@ on:
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terraform init'
+      - name: 'Terraform init for  generate certificate private '
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/private-subnet
 
-      - name: 'Terraform validate'
+      - name: 'Terraform validate for generate certificate private '
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/private-subnet
 
-      - name: 'Terraform init'
+      - name: 'Terraform plan for generate certificate private'
         uses: 'clouddrove/github-actions@v7.0'
         with:
-          actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/public-subnet
-
-      - name: 'Terraform validate'
-        uses: 'clouddrove/github-actions@v7.0'
-        with:
-          actions_subcommand: 'validate'
-          tf_actions_working_dir: ./_example/public-subnet
-
-
-
-  plan:
-    name: 'terraform plan'
+          actions_subcommand: 'plan'
+          tf_actions_working_dir: ./_example/private-subnet
+  public:
+    name: 'public'
+    needs: fmt
     runs-on: ubuntu-latest
     steps:
+
       - name: 'Checkout'
         uses: actions/checkout@v2.3.4
 
-      - name: 'Terraform init'
-        uses: 'clouddrove/github-actions@v7.0'
-        with:
-          actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/private-subnet
-
       - name: 'Configure AWS Credentials'
         uses: clouddrove/configure-aws-credentials@v1
         with:
@@ -78,39 +64,30 @@ on:
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terraform plan'
-        uses: 'clouddrove/github-actions@v7.0'
-        with:
-          actions_subcommand: 'plan'
-          tf_actions_working_dir: ./_example/private-subnet
-
-
-      - name: 'Terraform init'
+      - name: 'Terraform init for generate certificate public'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-subnet
 
-      - name: 'Configure AWS Credentials'
-        uses: clouddrove/configure-aws-credentials@v1
+      - name: 'Terraform validate for generate certificate public'
+        uses: 'clouddrove/github-actions@v7.0'
         with:
-          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
-          aws-region: us-east-2
+          actions_subcommand: 'validate'
+          tf_actions_working_dir: ./_example/public-subnet
 
-      - name: 'Terraform plan'
+      - name: 'Terraform plan for generate certificate public'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/public-subnet
-
 
   pre-commit:
     name: 'Pre-Commit'
     needs:
       - fmt
-      - plan
-      - validate
+      - private
+      - public
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
