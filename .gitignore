@@ -6,3 +6,4 @@
 *.iml
 go.sum
 *.terraform.lock.hcl
+*.terraform.tfstate.lock.info

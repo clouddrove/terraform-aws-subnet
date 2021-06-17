@@ -23,7 +23,7 @@ jobs:
 
       - name: 'Terratest public-subnet'
         if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'terratest'
           tf_actions_working_dir: '_test/public-subnet'
@@ -32,7 +32,7 @@ jobs:
 
       - name: 'Terratest public-private-subnet'
         if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@v4.0'
+        uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'terratest'
           tf_actions_working_dir: '_test/public-private-subnet'
