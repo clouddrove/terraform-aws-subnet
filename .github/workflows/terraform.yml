@@ -4,75 +4,78 @@ on:
     branches:
       - master
 
-jobs:
-  fmt:
-    name: 'terraform fmt'
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@master
 
-      - name: 'Terraform Format'
-        uses: 'clouddrove/github-actions@v7.0'
-        with:
-          actions_subcommand: 'fmt'
-      - name: 'Terraform Format'
-        uses: 'clouddrove/github-actions@v7.0'
-        with:
-          actions_subcommand: 'fmt'
-
-  validate:
-    name: 'terraform validate'
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
-
-      - name: 'Configure AWS Credentials'
+      - name: Configure AWS Credentials
         uses: clouddrove/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terraform init'
+      - name: 'Terraform Format'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'fmt'
+
+      - name: 'Terraform init Public-subnet'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'init'
+          tf_actions_working_dir: ./_example/public-subnet
+
+      - name: 'Terraform validate Public-subnet'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'validate'
+          tf_actions_working_dir: ./_example/public-subnet
+
+      - name: 'Terraform plan Public-subnet'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'plan'
+          tf_actions_working_dir: ./_example/public-subnet
+
+      - name: 'Terraform init Private-subnet'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/private-subnet
 
-      - name: 'Terraform validate'
+      - name: 'Terraform validate Private-subnet'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/private-subnet
 
-  plan:
-    name: 'terraform plan'
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2.3.4
-
-      - name: 'Terraform init'
-        uses: 'clouddrove/github-actions@v7.0'
-        with:
-          actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/private-subnet
-
-      - name: 'Configure AWS Credentials'
-        uses: clouddrove/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
-          aws-region: us-east-2
-
-      - name: 'Terraform plan'
+      - name: 'Terraform plan Private-subnet'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/private-subnet
 
+      - name: 'Terraform init Public-Private-subnet'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'init'
+          tf_actions_working_dir: ./_example/public-private-subnet
+
+      - name: 'Terraform validate Public-Private-subnet'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'validate'
+          tf_actions_working_dir: ./_example/public-private-subnet
+
+      - name: 'Terraform plan Public-Private-subnet'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'plan'
+          tf_actions_working_dir: ./_example/public-private-subnet
 
   pre-commit:
     name: 'Pre-Commit'
