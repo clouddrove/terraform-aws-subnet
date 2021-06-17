@@ -36,13 +36,27 @@ on:
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/default-s3
+          tf_actions_working_dir: ./_example/private-subnet
 
       - name: 'Terraform validate'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'validate'
-          tf_actions_working_dir: ./_example/default-s3
+          tf_actions_working_dir: ./_example/private-subnet
+
+      - name: 'Terraform init'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'init'
+          tf_actions_working_dir: ./_example/public-subnet
+
+      - name: 'Terraform validate'
+        uses: 'clouddrove/github-actions@v7.0'
+        with:
+          actions_subcommand: 'validate'
+          tf_actions_working_dir: ./_example/public-subnet
+
+
 
   plan:
     name: 'terraform plan'
@@ -57,17 +71,25 @@ on:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/private-subnet
 
-      - name: 'Terraform init'
+      - name: 'Configure AWS Credentials'
+        uses: clouddrove/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
+          aws-region: us-east-2
+
+      - name: 'Terraform plan'
         uses: 'clouddrove/github-actions@v7.0'
         with:
-          actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/public-subnet
+          actions_subcommand: 'plan'
+          tf_actions_working_dir: ./_example/private-subnet
+
 
       - name: 'Terraform init'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'init'
-          tf_actions_working_dir: ./_example/public-private-subnet
+          tf_actions_working_dir: ./_example/public-subnet
 
       - name: 'Configure AWS Credentials'
         uses: clouddrove/configure-aws-credentials@v1
@@ -80,7 +102,8 @@ on:
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'plan'
-          tf_actions_working_dir: ./_example/default-s3
+          tf_actions_working_dir: ./_example/public-subnet
+
 
   pre-commit:
     name: 'Pre-Commit'
