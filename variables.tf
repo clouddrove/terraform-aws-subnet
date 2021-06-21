@@ -193,3 +193,9 @@ variable "ipv4_cidrs" {
   default     = []
   description = "Subnet CIDR blocks (e.g. `10.0.0.0/16`)."
 }
+
+variable "single_nat_gateway" {
+  type = bool
+  default = true
+  
+}
