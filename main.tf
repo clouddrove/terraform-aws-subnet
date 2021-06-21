@@ -7,7 +7,7 @@ locals {
   public_count               = var.enabled == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_nat_gateways_count = var.enabled == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
   private_count              = var.enabled == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
-  nat_gateway_count          = var.single_nat_gateway ? 1 : local.private_nat_gateways_count 
+  nat_gateway_count          = var.single_nat_gateway ? 1 : local.private_nat_gateways_count
 
 }
 
@@ -175,7 +175,7 @@ resource "aws_route_table_association" "public" {
 
   subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = element(aws_route_table.public.*.id, count.index)
-  
+
 
   depends_on = [
     aws_subnet.public,
@@ -315,7 +315,7 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   count = local.private_count
 
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  subnet_id = element(aws_subnet.private.*.id, count.index)
   # route_table_id = element(aws_route_table.private.*.id, count.index)
   route_table_id = element(
     aws_route_table.private.*.id,

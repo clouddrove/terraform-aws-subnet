@@ -195,7 +195,7 @@ variable "ipv4_cidrs" {
 }
 
 variable "single_nat_gateway" {
-  type = bool
+  type    = bool
   default = true
-  
+
 }
