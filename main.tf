@@ -327,7 +327,7 @@ resource "aws_route_table_association" "private" {
 #Description : Provides a resource to create a routing table entry (a route) in a VPC
 #              routing table.
 resource "aws_route" "nat_gateway" {
-  count = local.nat_gateway_count
+  count = local.nat_gateway_count > 0 ? local.nat_gateway_count : 0
 
   route_table_id         = element(aws_route_table.private.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
