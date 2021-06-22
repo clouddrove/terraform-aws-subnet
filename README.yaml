@@ -71,6 +71,26 @@ usage: |-
     }
   ```
 
+    ### Public-Private Subnet with single Nat Gateway
+  ```hcl
+    module "subnets" {
+      source              = "clouddrove/terraform-aws-subnet/aws"
+      version             = "0.15.0"
+      name                = "subnets"
+      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
+      environment         = "test"
+      label_order         = ["name", "environment"]
+      availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id              = "vpc-xxxxxxxxx"
+      type                = "public-private"
+      igw_id              = "ig-xxxxxxxxx"
+      nat_gateway_enabled = true
+      single_nat_gateway  = true
+      cidr_block          = "10.0.0.0/16"
+      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+    }
+  ```
+
   ### Public Subnet
   ```hcl
     module "subnets" {
