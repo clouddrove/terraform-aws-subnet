@@ -131,18 +131,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terraform init for  public-private-singal-nat-gateway'
+      - name: 'Terraform init for  public-private-subnet-single-nat-gateway'
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-private-subnet-single-nat-gateway
 
-      - name: 'Terraform validate for public-privatesubnet-single-nat-gateway '
+      - name: 'Terraform validate for public-private-subnet-single-nat-gateway '
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/public-private-subnet-single-nat-gateway
-      - name: 'Terraform plan for public-private-subnet-single-nat-gateway
+      - name: 'Terraform plan for public-private-subnet-single-nat-gateway '
         uses: 'clouddrove/github-actions@v7.0'
         with:
           actions_subcommand: 'plan'
