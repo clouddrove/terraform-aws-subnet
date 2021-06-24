@@ -39,7 +39,6 @@ usage: |-
       source              = "clouddrove/terraform-aws-subnet/aws"
       version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -58,7 +57,6 @@ usage: |-
       source              = "clouddrove/terraform-aws-subnet/aws"
       version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -77,7 +75,6 @@ usage: |-
       source              = "clouddrove/terraform-aws-subnet/aws"
       version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -97,13 +94,30 @@ usage: |-
       source              = "clouddrove/terraform-aws-subnet/aws"
       version             = "0.15.0"
       name                = "subnets"
-      repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
       environment         = "test"
       label_order         = ["name", "environment"]
       availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
       vpc_id              = "vpc-xxxxxxxxx"
       type                = "public"
       igw_id              = "ig-xxxxxxxxx"
+      cidr_block          = "10.0.0.0/16"
+      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+    }
+  ```
+  ### Public-private-subnet-single-nat-gateway
+  ```hcl
+    module "subnets" {
+      source              = "clouddrove/terraform-aws-subnet/aws"
+      version             = "0.15.0"
+      nat_gateway_enabled = true
+      single_nat_gateway  = true
+      name                = "subnets"
+      environment         = "example"
+      label_order         = ["name", "environment"]
+      availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id              = "vpc-xxxxxxxxxx"
+      type                = "public-private"
+      igw_id              = "ig-xxxxxxxxxxx"
       cidr_block          = "10.0.0.0/16"
       ipv6_cidr_block     = module.vpc.ipv6_cidr_block
     }
