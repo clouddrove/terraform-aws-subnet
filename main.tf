@@ -7,6 +7,8 @@ locals {
   public_count               = var.enabled == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_nat_gateways_count = var.enabled == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
   private_count              = var.enabled == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
+  nat_gateway_count          = var.single_nat_gateway ? 1 : local.private_nat_gateways_count
+
 }
 
 #Module      : label
@@ -173,6 +175,8 @@ resource "aws_route_table_association" "public" {
 
   subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = element(aws_route_table.public.*.id, count.index)
+
+
   depends_on = [
     aws_subnet.public,
     aws_route_table.public,
@@ -311,15 +315,19 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   count = local.private_count
 
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
-  route_table_id = element(aws_route_table.private.*.id, count.index)
+  subnet_id = element(aws_subnet.private.*.id, count.index)
+  # route_table_id = element(aws_route_table.private.*.id, count.index)
+  route_table_id = element(
+    aws_route_table.private.*.id,
+    var.single_nat_gateway ? 0 : count.index,
+  )
 }
 
 #Module      : ROUTE
 #Description : Provides a resource to create a routing table entry (a route) in a VPC
 #              routing table.
 resource "aws_route" "nat_gateway" {
-  count = local.private_nat_gateways_count
+  count = local.nat_gateway_count > 0 ? local.nat_gateway_count : 0
 
   route_table_id         = element(aws_route_table.private.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
@@ -330,7 +338,7 @@ resource "aws_route" "nat_gateway" {
 #Module      : EIP
 #Description : Provides an Elastic IP resource..
 resource "aws_eip" "private" {
-  count = local.private_nat_gateways_count
+  count = local.nat_gateway_count
 
   vpc = true
   tags = merge(
@@ -347,7 +355,7 @@ resource "aws_eip" "private" {
 #Module      : NAT GATEWAY
 #Description : Provides a resource to create a VPC NAT Gateway.
 resource "aws_nat_gateway" "private" {
-  count = local.private_nat_gateways_count
+  count = local.nat_gateway_count
 
   allocation_id = element(aws_eip.private.*.id, count.index)
   subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public.*.id, count.index) : element(var.public_subnet_ids, count.index)
