@@ -199,4 +199,3 @@ variable "single_nat_gateway" {
   default = false
 
 }
-  
