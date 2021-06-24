@@ -156,7 +156,7 @@ jobs:
       - private
       - public
       - public-private
-      - public-private-singal-nat-gateway
+      - public-private-subnet-single-nat-gateway
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
