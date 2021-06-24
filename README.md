@@ -7,7 +7,7 @@
     Terraform AWS Subnet
 </h1>
 
-<p align="center" style="font-size: 1.2rem;">
+<p align="center" style="font-size: 1.2rem;"> 
     Terraform module to create public, private and public-private subnet with network acl, route table, Elastic IP, nat gateway, flow log.
      </p>
 
@@ -38,7 +38,7 @@
 <hr>
 
 
-We eat, drink, sleep and most importantly love **DevOps**. We are working towards strategies for standardizing architecture while ensuring security for the infrastructure. We are strong believer of the philosophy <b>Bigger problems are always solved by breaking them into smaller manageable problems</b>. Resonating with microservices architecture, it is considered best-practice to run database, cluster, storage in smaller <b>connected yet manageable pieces</b> within the infrastructure.
+We eat, drink, sleep and most importantly love **DevOps**. We are working towards strategies for standardizing architecture while ensuring security for the infrastructure. We are strong believer of the philosophy <b>Bigger problems are always solved by breaking them into smaller manageable problems</b>. Resonating with microservices architecture, it is considered best-practice to run database, cluster, storage in smaller <b>connected yet manageable pieces</b> within the infrastructure. 
 
 This module is basically combination of [Terraform open source](https://www.terraform.io/) and includes automatation tests and examples. It also helps to create and improve your infrastructure with minimalistic code instead of maintaining the whole infrastructure code yourself.
 
@@ -49,7 +49,7 @@ We have [*fifty plus terraform modules*][terraform_modules]. A few of them are c
 
 ## Prerequisites
 
-This module has a few dependencies:
+This module has a few dependencies: 
 
 - [Terraform 0.13](https://learn.hashicorp.com/terraform/getting-started/install.html)
 - [Go](https://golang.org/doc/install)
@@ -75,7 +75,6 @@ Here are some examples of how you can use this module in your inventory structur
     source              = "clouddrove/terraform-aws-subnet/aws"
     version             = "0.15.0"
     name                = "subnets"
-    repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
     environment         = "test"
     label_order         = ["name", "environment"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -94,7 +93,6 @@ Here are some examples of how you can use this module in your inventory structur
     source              = "clouddrove/terraform-aws-subnet/aws"
     version             = "0.15.0"
     name                = "subnets"
-    repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
     environment         = "test"
     label_order         = ["name", "environment"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -107,19 +105,55 @@ Here are some examples of how you can use this module in your inventory structur
   }
 ```
 
+  ### Public-Private Subnet with single Nat Gateway
+```hcl
+  module "subnets" {
+    source              = "clouddrove/terraform-aws-subnet/aws"
+    version             = "0.15.0"
+    name                = "subnets"
+    environment         = "test"
+    label_order         = ["name", "environment"]
+    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id              = "vpc-xxxxxxxxx"
+    type                = "public-private"
+    igw_id              = "ig-xxxxxxxxx"
+    nat_gateway_enabled = true
+    single_nat_gateway  = true
+    cidr_block          = "10.0.0.0/16"
+    ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+  }
+```
+
 ### Public Subnet
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
     version             = "0.15.0"
     name                = "subnets"
-    repository          = "https://registry.terraform.io/modules/clouddrove/subnet/aws/0.15.0"
     environment         = "test"
     label_order         = ["name", "environment"]
     availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
     vpc_id              = "vpc-xxxxxxxxx"
     type                = "public"
     igw_id              = "ig-xxxxxxxxx"
+    cidr_block          = "10.0.0.0/16"
+    ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+  }
+```
+### Public-private-subnet-single-nat-gateway
+```hcl
+  module "subnets" {
+    source              = "clouddrove/terraform-aws-subnet/aws"
+    version             = "0.15.0"
+    nat_gateway_enabled = true
+    single_nat_gateway  = true
+    name                = "subnets"
+    environment         = "example"
+    label_order         = ["name", "environment"]
+    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id              = "vpc-xxxxxxxxxx"
+    type                = "public-private"
+    igw_id              = "ig-xxxxxxxxxxx"
     cidr_block          = "10.0.0.0/16"
     ipv6_cidr_block     = module.vpc.ipv6_cidr_block
   }
@@ -159,6 +193,7 @@ Here are some examples of how you can use this module in your inventory structur
 | public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
 | repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-subnet"` | no |
 | s3\_bucket\_arn | S3 ARN for vpc logs. | `string` | `""` | no |
+| single\_nat\_gateway | n/a | `bool` | `false` | no |
 | tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(any)` | `{}` | no |
 | traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | `string` | `"ALL"` | no |
 | type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
@@ -183,7 +218,7 @@ Here are some examples of how you can use this module in your inventory structur
 
 
 ## Testing
-In this module testing is performed with [terratest](https://github.com/gruntwork-io/terratest) and it creates a small piece of infrastructure, matches the output like ARN, ID and Tags name etc and destroy infrastructure in your AWS account. This testing is written in GO, so you need a [GO environment](https://golang.org/doc/install) in your system.
+In this module testing is performed with [terratest](https://github.com/gruntwork-io/terratest) and it creates a small piece of infrastructure, matches the output like ARN, ID and Tags name etc and destroy infrastructure in your AWS account. This testing is written in GO, so you need a [GO environment](https://golang.org/doc/install) in your system. 
 
 You need to run the following command in the testing folder:
 ```hcl
@@ -192,7 +227,7 @@ You need to run the following command in the testing folder:
 
 
 
-## Feedback
+## Feedback 
 If you come accross a bug or have any feedback, please log it in our [issue tracker](https://github.com/clouddrove/terraform-aws-subnet/issues), or feel free to drop us an email at [hello@clouddrove.com](mailto:hello@clouddrove.com).
 
 If you have found it worth your time, go ahead and give us a ★ on [our GitHub](https://github.com/clouddrove/terraform-aws-subnet)!
