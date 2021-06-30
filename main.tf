@@ -26,7 +26,7 @@ module "private-labels" {
   label_order = var.label_order
   attributes  = compact(concat(var.attributes, ["private"]))
   extra_tags = {
-    type = "private"
+    Type = "private"
   }
 }
 
@@ -41,7 +41,7 @@ module "public-labels" {
   label_order = var.label_order
   attributes  = compact(concat(var.attributes, ["public"]))
   extra_tags = {
-    type = "public"
+    Type = "public"
   }
 }
 
