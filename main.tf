@@ -25,6 +25,9 @@ module "private-labels" {
   managedby   = var.managedby
   label_order = var.label_order
   attributes  = compact(concat(var.attributes, ["private"]))
+  extra_tags = {
+    Type = "private"
+  }
 }
 
 module "public-labels" {
@@ -37,6 +40,9 @@ module "public-labels" {
   managedby   = var.managedby
   label_order = var.label_order
   attributes  = compact(concat(var.attributes, ["public"]))
+  extra_tags = {
+    Type = "public"
+  }
 }
 
 #Module      : PUBLIC SUBNET
