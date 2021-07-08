@@ -30,6 +30,5 @@ func Test(t *testing.T) {
 	//Expected Values
 
 	// Check that we get back the outputs that we expect
-	assert.Equal(t, expectedPublicSubnetCidrs, publicSubnetCidrs)
 	assert.Equal(t, "subnets-test-public", publicTags["Name"])
 }
