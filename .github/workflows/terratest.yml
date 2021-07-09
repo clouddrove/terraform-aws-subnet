@@ -21,12 +21,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.TEST_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-2
 
-      - name: 'Terratest public-subnet'
-        if: ${{ github.event.label.name == 'terratest' }}
-        uses: 'clouddrove/github-actions@v8.0'
-        with:
-          actions_subcommand: 'terratest'
-          tf_actions_working_dir: '_test/public-private-subnet'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
