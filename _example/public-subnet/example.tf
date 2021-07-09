@@ -20,7 +20,7 @@ module "subnets" {
   environment = "test"
   label_order = ["name", "environment"]
 
-  availability_zones = ["us-east-1a", "us-east-1b"]
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c" ]
   vpc_id             = module.vpc.vpc_id
   type               = "public"
   igw_id             = module.vpc.igw_id
