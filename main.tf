@@ -66,7 +66,7 @@ resource "aws_subnet" "public" {
     local.public_count + count.index
   ) : var.ipv6_cidrs[count.index]
   map_public_ip_on_launch         = var.map_public_ip_on_launch
-  assign_ipv6_address_on_creation = false
+  assign_ipv6_address_on_creation = var.assign_ipv6_address_on_creation
 
   tags = merge(
     module.public-labels.tags, var.tags,
