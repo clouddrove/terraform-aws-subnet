@@ -168,6 +168,7 @@ Here are some examples of how you can use this module in your inventory structur
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| assign\_ipv6\_address\_on\_creation | Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address. | `bool` | `false` | no |
 | attributes | Additional attributes (e.g. `1`). | `list(any)` | `[]` | no |
 | availability\_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`). | `list(string)` | `[]` | no |
 | az\_ngw\_count | Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857. | `number` | `0` | no |
