@@ -25,13 +25,10 @@ func Test(t *testing.T) {
 	defer terraform.Destroy(t, terraformOptions)
 
 	// To get the value of an output variable, run 'terraform output'
-	publicSubnetCidrs := terraform.OutputList(t, terraformOptions, "public_subnet_cidrs")
 	publicTags := terraform.OutputMap(t, terraformOptions, "public_tags")
 
 	//Expected Values
-	expectedPublicSubnetCidrs := []string{"10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"}
 
 	// Check that we get back the outputs that we expect
-	assert.Equal(t, expectedPublicSubnetCidrs, publicSubnetCidrs)
-	assert.Equal(t, "test-clouddrove-subnets-public", publicTags["Name"])
+	assert.Equal(t, "subnets-test-public", publicTags["Name"])
 }

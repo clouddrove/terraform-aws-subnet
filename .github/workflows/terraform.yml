@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2.3.4
 
       - name: 'Terraform Format'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'fmt'
 
@@ -32,19 +32,19 @@ jobs:
           aws-region: us-east-2
 
       - name: 'Terraform init for  generate certificate private '
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/private-subnet
 
       - name: 'Terraform validate for generate certificate private '
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/private-subnet
 
       - name: 'Terraform plan for generate certificate private'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/private-subnet
@@ -65,19 +65,19 @@ jobs:
           aws-region: us-east-2
 
       - name: 'Terraform init for generate certificate public'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-subnet
 
       - name: 'Terraform validate for generate certificate public'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/public-subnet
 
       - name: 'Terraform plan for generate certificate public'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/public-subnet
@@ -99,19 +99,19 @@ jobs:
           aws-region: us-east-2
 
       - name: 'Terraform init for generate certificate public-private'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-private-subnet
 
       - name: 'Terraform validate for generate certificate public-private'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/public-private-subnet
 
       - name: 'Terraform plan for generate certificate public-private'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/public-private-subnet
@@ -132,18 +132,18 @@ jobs:
           aws-region: us-east-2
 
       - name: 'Terraform init for  public-private-subnet-single-nat-gateway'
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'init'
           tf_actions_working_dir: ./_example/public-private-subnet-single-nat-gateway
 
       - name: 'Terraform validate for public-private-subnet-single-nat-gateway '
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'validate'
           tf_actions_working_dir: ./_example/public-private-subnet-single-nat-gateway
       - name: 'Terraform plan for public-private-subnet-single-nat-gateway '
-        uses: 'clouddrove/github-actions@v7.0'
+        uses: 'clouddrove/github-actions@v8.0'
         with:
           actions_subcommand: 'plan'
           tf_actions_working_dir: ./_example/public-private-subnet-single-nat-gateway
