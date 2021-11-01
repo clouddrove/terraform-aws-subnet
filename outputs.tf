@@ -50,3 +50,11 @@ output "public_tags" {
   value       = module.public-labels.tags
   description = "A mapping of public tags to assign to the resource."
 }
+
+output "public_acl" {
+  value = join("", aws_network_acl.public.*.id)
+}
+
+output "private_acl" {
+  value = join("", aws_network_acl.private.*.id)
+}
