@@ -17,7 +17,7 @@ module "private-subnets" {
   vpc_id                          = "vpc-xxxxxxxxxxxxxxxxxxxxx"
   type                            = "private"
   cidr_block                      = "10.0.0.0/16"
-  ipv6_cidr_block                 = "ffff:ffff:fff:ffff::/ff"
+  ipv6_cidr_block                 = "ffff:ffff:fff:ffff::/56"
   public_subnet_ids               = ["subnet-xxxxxxxxxxxxxx", "subnet-xxxxxxxxxxx"]
   assign_ipv6_address_on_creation = false
 }
