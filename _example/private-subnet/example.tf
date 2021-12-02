@@ -1,17 +1,8 @@
 provider "aws" {
-  region = "eu-west-1"
+  region = "us-east-1"
 }
 
-module "vpc" {
-  source  = "clouddrove/vpc/aws"
-  version = "0.15.0"
 
-  name        = "vpc"
-  environment = "test"
-  label_order = ["name", "environment"]
-
-  cidr_block = "10.0.0.0/16"
-}
 
 module "private-subnets" {
   source = "./../../"
@@ -22,11 +13,11 @@ module "private-subnets" {
 
   nat_gateway_enabled = true
 
-  availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-  vpc_id                          = module.vpc.vpc_id
+  availability_zones              = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  vpc_id                          = "vpc-xxxxxxxxxxxxxxxxxxxxx"
   type                            = "private"
-  cidr_block                      = module.vpc.vpc_cidr_block
-  ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
-  public_subnet_ids               = ["subnet-XXXXXXXXXXXXX", "subnet-XXXXXXXXXXXXX"]
+  cidr_block                      = "10.0.0.0/16"
+  ipv6_cidr_block                 = "ffff:ffff:fff:ffff::/ff"
+  public_subnet_ids               = ["subnet-xxxxxxxxxxxxxx", "subnet-xxxxxxxxxxx"]
   assign_ipv6_address_on_creation = false
 }
