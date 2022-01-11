@@ -51,7 +51,7 @@ We have [*fifty plus terraform modules*][terraform_modules]. A few of them are c
 
 This module has a few dependencies: 
 
-- [Terraform 0.13](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Terraform 1.x.x](https://learn.hashicorp.com/terraform/getting-started/install.html)
 - [Go](https://golang.org/doc/install)
 - [github.com/stretchr/testify/assert](https://github.com/stretchr/testify)
 - [github.com/gruntwork-io/terratest/modules/terraform](https://github.com/gruntwork-io/terratest)
@@ -204,11 +204,13 @@ Here are some examples of how you can use this module in your inventory structur
 
 | Name | Description |
 |------|-------------|
+| private\_acl | n/a |
 | private\_route\_tables\_id | The ID of the routing table. |
 | private\_subnet\_cidrs | CIDR blocks of the created private subnets. |
 | private\_subnet\_cidrs\_ipv6 | CIDR blocks of the created private subnets. |
 | private\_subnet\_id | The ID of the private subnet. |
 | private\_tags | A mapping of private tags to assign to the resource. |
+| public\_acl | n/a |
 | public\_route\_tables\_id | The ID of the routing table. |
 | public\_subnet\_cidrs | CIDR blocks of the created public subnets. |
 | public\_subnet\_cidrs\_ipv6 | CIDR blocks of the created public subnets. |
