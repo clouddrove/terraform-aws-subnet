@@ -229,7 +229,7 @@ resource "aws_subnet" "private" {
     count.index
   ) : var.ipv6_cidrs[count.index]
 
-  assign_ipv6_address_on_creation = false
+  assign_ipv6_address_on_creation = var.assign_ipv6_address_on_creation
 
   tags = merge(
     module.private-labels.tags,
