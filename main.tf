@@ -54,11 +54,11 @@ resource "aws_subnet" "public" {
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
 
-  cidr_block = length(var.ipv4_cidrs) == 0 ? cidrsubnet(
+  cidr_block = length(var.ipv4_public_cidrs) == 0 ? cidrsubnet(
     signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
     ceil(log(local.public_count * 2, 2)),
     local.public_count + count.index
-  ) : var.ipv4_cidrs[count.index]
+  ) : var.ipv4_public_cidrs[count.index]
 
   ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
     signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
@@ -217,11 +217,11 @@ resource "aws_subnet" "private" {
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
 
-  cidr_block = length(var.ipv4_cidrs) == 0 ? cidrsubnet(
+  cidr_block = length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(
     signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
     local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)),
     count.index
-  ) : var.ipv4_cidrs[count.index]
+  ) : var.ipv4_private_cidrs[count.index]
 
   ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
     signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
@@ -229,7 +229,7 @@ resource "aws_subnet" "private" {
     count.index
   ) : var.ipv6_cidrs[count.index]
 
-  assign_ipv6_address_on_creation = var.assign_ipv6_address_on_creation
+  assign_ipv6_address_on_creation = false
 
   tags = merge(
     module.private-labels.tags,
