@@ -33,7 +33,7 @@ jobs:
         directory:
           - _example/private-subnet
           - _example/public-private-subnet
-          - _example/public-private-subnet-single-net-gateway
+          - _example/public-private-subnet-single-nat-gateway
           - _example/public-subnet
 
     steps:
