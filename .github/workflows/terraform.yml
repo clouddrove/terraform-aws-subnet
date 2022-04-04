@@ -32,11 +32,11 @@ jobs:
           - ${{ needs.versionExtract.outputs.maxVersion }}
         directory:
           - _example/private-subnet
-          - _example/public-private-subnet
           - _example/public-private-subnet-single-nat-gateway
+          - _example/public-private-subnet
           - _example/public-subnet
 
-   steps:
+    steps:
       - name: Checkout
         uses: actions/checkout@v2
 
