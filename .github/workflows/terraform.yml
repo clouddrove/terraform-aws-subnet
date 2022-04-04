@@ -36,7 +36,7 @@ jobs:
           - _example/public-private-subnet-single-nat-gateway
           - _example/public-subnet
 
-    steps:
+   steps:
       - name: Checkout
         uses: actions/checkout@v2
 
