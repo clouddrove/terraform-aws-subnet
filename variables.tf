@@ -104,7 +104,6 @@ variable "igw_id" {
   default     = ""
   description = "Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`)."
   sensitive   = true
-
 }
 
 variable "az_ngw_ids" {
@@ -112,7 +111,6 @@ variable "az_ngw_ids" {
   default     = {}
   description = "Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets."
   sensitive   = true
-
 }
 
 variable "public_network_acl_id" {
@@ -120,7 +118,6 @@ variable "public_network_acl_id" {
   default     = ""
   description = "Network ACL ID that is added to the public subnets. If empty, a new ACL will be created."
   sensitive   = true
-
 }
 
 variable "private_network_acl_id" {
@@ -128,7 +125,6 @@ variable "private_network_acl_id" {
   default     = ""
   description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created."
   sensitive   = true
-
 }
 
 variable "enabled" {
