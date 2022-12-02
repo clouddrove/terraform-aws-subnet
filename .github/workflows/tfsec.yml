@@ -12,7 +12,7 @@ jobs:
 
       - name: Terraform security scan
         if: github.event_name == 'pull_request'
-        uses: triat/terraform-security-scan@master
+        uses: triat/terraform-security-scan@tfsec
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           soft_fail: true
