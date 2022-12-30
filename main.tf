@@ -17,7 +17,7 @@ locals {
 #              naming convention.
 module "private-labels" {
   source  = "clouddrove/labels/aws"
-  version = "0.15.0"
+  version = "1.3.0"
 
   name        = var.name
   repository  = var.repository
@@ -32,7 +32,7 @@ module "private-labels" {
 
 module "public-labels" {
   source  = "clouddrove/labels/aws"
-  version = "0.15.0"
+  version = "1.3.0"
 
   name        = var.name
   repository  = var.repository

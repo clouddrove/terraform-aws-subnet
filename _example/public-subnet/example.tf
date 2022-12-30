@@ -4,7 +4,7 @@ provider "aws" {
 
 module "vpc" {
   source  = "clouddrove/vpc/aws"
-  version = "0.15.1"
+  version = "1.3.0"
 
   name        = "vpc"
   environment = "test"
@@ -27,4 +27,5 @@ module "subnets" {
   cidr_block                      = module.vpc.vpc_cidr_block
   ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
   assign_ipv6_address_on_creation = false
+
 }
