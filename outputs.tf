@@ -53,8 +53,10 @@ output "public_tags" {
 
 output "public_acl" {
   value = join("", aws_network_acl.public.*.id)
+  description = "The ID of the network ACL."
 }
 
 output "private_acl" {
   value = join("", aws_network_acl.private.*.id)
+  description = "The ID of the network ACL."
 }
