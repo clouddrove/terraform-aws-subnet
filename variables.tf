@@ -159,7 +159,7 @@ variable "enable_flow_log" {
 
 variable "map_public_ip_on_launch" {
   type        = bool
-  default     = false
+  default     = true
   description = "Specify true to indicate that instances launched into the subnet should be assigned a public IP address."
 }
 
