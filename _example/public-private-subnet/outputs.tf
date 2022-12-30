@@ -27,8 +27,3 @@ output "public_tags" {
   value       = module.subnets.public_tags
   description = "A mapping of tags to assign to the resource."
 }
-
-output "public_subnet_id" {
-  value       = module.subnets.private_subnet_id
-  description = "A mapping of tags to assign to the resource."
-}
