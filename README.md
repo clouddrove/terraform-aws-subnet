@@ -79,7 +79,7 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.15.3"
+    version             = "1.3.0"
     name                = "subnets"
     environment         = "test"
     label_order         = ["name", "environment"]
@@ -97,7 +97,7 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.15.3"
+    version             = "1.3.0"
     name                = "subnets"
     environment         = "test"
     label_order         = ["name", "environment"]
@@ -115,7 +115,7 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.15.3"
+    version             = "1.3.0"
     name                = "subnets"
     environment         = "test"
     label_order         = ["name", "environment"]
@@ -134,7 +134,7 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.15.3"
+    version             = "1.3.0"
     name                = "subnets"
     environment         = "test"
     label_order         = ["name", "environment"]
@@ -150,7 +150,7 @@ Here are some examples of how you can use this module in your inventory structur
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "0.15.3"
+    version             = "1.3.0"
     nat_gateway_enabled = true
     single_nat_gateway  = true
     name                = "subnets"
@@ -211,13 +211,13 @@ Here are some examples of how you can use this module in your inventory structur
 
 | Name | Description |
 |------|-------------|
-| private\_acl | n/a |
+| private\_acl | The ID of the network ACL. |
 | private\_route\_tables\_id | The ID of the routing table. |
 | private\_subnet\_cidrs | CIDR blocks of the created private subnets. |
 | private\_subnet\_cidrs\_ipv6 | CIDR blocks of the created private subnets. |
 | private\_subnet\_id | The ID of the private subnet. |
 | private\_tags | A mapping of private tags to assign to the resource. |
-| public\_acl | n/a |
+| public\_acl | The ID of the network ACL. |
 | public\_route\_tables\_id | The ID of the routing table. |
 | public\_subnet\_cidrs | CIDR blocks of the created public subnets. |
 | public\_subnet\_cidrs\_ipv6 | CIDR blocks of the created public subnets. |

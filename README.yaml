@@ -43,7 +43,7 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.15.3"
+      version             = "1.3.0"
       name                = "subnets"
       environment         = "test"
       label_order         = ["name", "environment"]
@@ -61,7 +61,7 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.15.3"
+      version             = "1.3.0"
       name                = "subnets"
       environment         = "test"
       label_order         = ["name", "environment"]
@@ -79,7 +79,7 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.15.3"
+      version             = "1.3.0"
       name                = "subnets"
       environment         = "test"
       label_order         = ["name", "environment"]
@@ -98,7 +98,7 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.15.3"
+      version             = "1.3.0"
       name                = "subnets"
       environment         = "test"
       label_order         = ["name", "environment"]
@@ -114,7 +114,7 @@ usage: |-
   ```hcl
     module "subnets" {
       source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "0.15.3"
+      version             = "1.3.0"
       nat_gateway_enabled = true
       single_nat_gateway  = true
       name                = "subnets"
