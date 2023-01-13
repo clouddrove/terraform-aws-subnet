@@ -29,7 +29,7 @@ jobs:
         uses: aquasecurity/tfsec-sarif-action@v0.1.0
         with:
           sarif_file: tfsec.sarif
-          working_directory: ./
+          working_directory: ./_example/
           full_repo_scan: true
 
       - name: Upload SARIF file
@@ -42,7 +42,7 @@ jobs:
         uses: tfsec/tfsec-pr-commenter-action@main
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB}}
-          working_directory: ./
+          working_directory: ./_example/
 
 
       - name: 'Terraform security scan Advanced'
@@ -50,7 +50,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB}}
-          tfsec_actions_working_dir: ./
+          tfsec_actions_working_dir: ./_example/
           tfsec_actions_comment: true
           tfsec_output_format: sarif
         continue-on-error: true
