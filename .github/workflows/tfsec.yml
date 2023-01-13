@@ -2,20 +2,6 @@ name: tfsec
 on:
   pull_request:
 
-#jobs:
-#    terraform:
-#      name: "Terraform"
-#      runs-on: ubuntu-latest
-#      steps:
-#        - name: Checkout
-#          uses: actions/checkout@v2
-#
-#        - name: Setup Terraform
-#          uses: hashicorp/setup-terraform@v1
-#          with:
-#            terraform_version: 0.12.31
-#            cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
 jobs:
   tfsec:
     name: tfsec sarif report
