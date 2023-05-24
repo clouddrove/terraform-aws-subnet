@@ -9,19 +9,49 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+      # Add assignees
+    assignees:
+      - "clouddrove-ci"
+# Add reviewer
+    reviewers:
+      - "approvers"
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "_example/private-subnet" # Location of package manifests
     schedule:
       interval: "weekly"
+       # Add assignees
+    assignees:
+      - "clouddrove-ci"
+# Add reviewer
+    reviewers:
+      - "approvers"
   - package-ecosystem: "terraform" # See documentation for possible values
       directory: "_example/public-private-subnet" # Location of package manifests
       schedule:
         interval: "weekly"
+         # Add assignees
+    assignees:
+      - "clouddrove-ci"
+# Add reviewer
+    reviewers:
+      - "approvers"
   - package-ecosystem: "terraform" # See documentation for possible values
       directory: "_example/public-private-subnet-single-nat-gateway" # Location of package manifests
       schedule:
         interval: "weekly"
+         # Add assignees
+    assignees:
+      - "clouddrove-ci"
+# Add reviewer
+    reviewers:
+      - "approvers"
   - package-ecosystem: "terraform" # See documentation for possible values
       directory: "_example/public-subnet" # Location of package manifests
       schedule:
         interval: "weekly"
+         # Add assignees
+    assignees:
+      - "clouddrove-ci"
+# Add reviewer
+    reviewers:
+      - "approvers"
