@@ -75,25 +75,25 @@ This module has a few dependencies:
 
 
 Here are some examples of how you can use this module in your inventory structure:
-### Private Subnet
+### PRIVATE SUBNET
 ```hcl
   module "subnets" {
-    source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "1.3.0"
-    name                = "subnets"
-    environment         = "test"
-    label_order         = ["name", "environment"]
-    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-    vpc_id              = "vpc-xxxxxxxxx"
-    type                = "private"
-    nat_gateway_enabled = true
-    cidr_block          = "10.0.0.0/16"
-    ipv6_cidr_block     = module.vpc.ipv6_cidr_block
-    public_subnet_ids   = ["subnet-XXXXXXXXXXXXX", "subnet-XXXXXXXXXXXXX"]
+    source                = "clouddrove/terraform-aws-subnet/aws"
+    version               = "1.3.0"
+    name                  = "subnets"
+    environment           = "test"
+    label_order           = ["name", "environment"]
+    nat_gateway_enabled   = true
+    availability_zones    = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id                = module.vpc.vpc_id
+    type                  = "private"
+    cidr_block            = module.vpc.vpc_cidr_block
+    ipv6_cidr_block       = module.vpc.ipv6_cidr_block
+    public_subnet_ids     = ["subnet-xxxxxxxxxxxx", "subnet-xxxxxxxxxxxx"]
   }
 ```
 
-### Public-Private Subnet
+### PUBLIC-PRIVATE SUBNET
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
@@ -101,17 +101,17 @@ Here are some examples of how you can use this module in your inventory structur
     name                = "subnets"
     environment         = "test"
     label_order         = ["name", "environment"]
-    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-    vpc_id              = "vpc-xxxxxxxxx"
-    type                = "public-private"
-    igw_id              = "ig-xxxxxxxxx"
     nat_gateway_enabled = true
-    cidr_block          = "10.0.0.0/16"
+    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id              = module.vpc.vpc_id
+    type                = "public-private"
+    igw_id              = module.vpc.igw_id
+    cidr_block          = module.vpc.vpc_cidr_block
     ipv6_cidr_block     = module.vpc.ipv6_cidr_block
   }
 ```
 
-  ### Public-Private Subnet with single Nat Gateway
+  ### PUBLIC-PRIVATE SUBNET WITH SINGLE NET GATEWAY
 ```hcl
   module "subnets" {
     source              = "clouddrove/terraform-aws-subnet/aws"
@@ -120,48 +120,30 @@ Here are some examples of how you can use this module in your inventory structur
     environment         = "test"
     label_order         = ["name", "environment"]
     availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-    vpc_id              = "vpc-xxxxxxxxx"
-    type                = "public-private"
-    igw_id              = "ig-xxxxxxxxx"
     nat_gateway_enabled = true
     single_nat_gateway  = true
-    cidr_block          = "10.0.0.0/16"
+    vpc_id              = module.vpc.vpc_id
+    type                = "public-private"
+    igw_id              = module.vpc.igw_id
+    cidr_block          = module.vpc.vpc_cidr_block
     ipv6_cidr_block     = module.vpc.ipv6_cidr_block
   }
 ```
 
-### Public Subnet
+### PUBLIC SUBNET
 ```hcl
   module "subnets" {
-    source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "1.3.0"
-    name                = "subnets"
-    environment         = "test"
-    label_order         = ["name", "environment"]
-    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-    vpc_id              = "vpc-xxxxxxxxx"
-    type                = "public"
-    igw_id              = "ig-xxxxxxxxx"
-    cidr_block          = "10.0.0.0/16"
-    ipv6_cidr_block     = module.vpc.ipv6_cidr_block
-  }
-```
-### Public-private-subnet-single-nat-gateway
-```hcl
-  module "subnets" {
-    source              = "clouddrove/terraform-aws-subnet/aws"
-    version             = "1.3.0"
-    nat_gateway_enabled = true
-    single_nat_gateway  = true
-    name                = "subnets"
-    environment         = "example"
-    label_order         = ["name", "environment"]
-    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-    vpc_id              = "vpc-xxxxxxxxxx"
-    type                = "public-private"
-    igw_id              = "ig-xxxxxxxxxxx"
-    cidr_block          = "10.0.0.0/16"
-    ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+    source             = "clouddrove/terraform-aws-subnet/aws"
+    version            = "1.3.0"
+    name               = "subnets"
+    environment        = "test"
+    label_order        = ["name", "environment"]
+    availability_zones = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id             = module.vpc.vpc_id
+    type               = "public"
+    igw_id             = module.vpc.igw_id
+    cidr_block         = module.vpc.vpc_cidr_block
+    ipv6_cidr_block    = module.vpc.ipv6_cidr_block
   }
 ```
 
@@ -201,7 +183,7 @@ Here are some examples of how you can use this module in your inventory structur
 | public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
 | repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-subnet"` | no |
 | s3\_bucket\_arn | S3 ARN for vpc logs. | `string` | `""` | no |
-| single\_nat\_gateway | n/a | `bool` | `false` | no |
+| single\_nat\_gateway | Enable for only single NAT Gateway in one Availability Zone | `bool` | `false` | no |
 | tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(any)` | `{}` | no |
 | traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | `string` | `"ALL"` | no |
 | type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
