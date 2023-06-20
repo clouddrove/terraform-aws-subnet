@@ -378,7 +378,6 @@ resource "aws_route" "nat_gateway" {
 ##----------------------------------------------------------------------------------
 resource "aws_eip" "private" {
   count = local.nat_gateway_count
-
   domain = "vpc"
   tags = merge(
     module.private-labels.tags,
