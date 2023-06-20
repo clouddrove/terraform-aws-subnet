@@ -329,6 +329,30 @@ resource "aws_route_table_association" "private" {
   )
 }
 
+#Module      : VPC ENDPOINT
+#Description : Provides a resource to create A VPC endpoint 
+#              to privately connect to supported AWS services and VPC endpoint services powered by AWS PrivateLink.
+             
+data "aws_region" "current" {}
+
+resource "aws_vpc_endpoint" "s3" {
+  count = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  vpc_id       = var.vpc_id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
+  route_table_ids = flatten([
+    aws_route_table.public.*.id,
+    aws_route_table.private.*.id
+  ])
+
+  tags = merge(
+    module.private-labels.tags,
+    {
+      Name        = "endpointS3",
+      Environment = var.environment
+    }
+  )
+}
+
 #Module      : ROUTE
 #Description : Provides a resource to create a routing table entry (a route) in a VPC
 #              routing table.
@@ -346,7 +370,7 @@ resource "aws_route" "nat_gateway" {
 resource "aws_eip" "private" {
   count = local.nat_gateway_count
 
-  vpc = true
+  domain = "vpc"
   tags = merge(
     module.private-labels.tags,
     {

@@ -205,3 +205,9 @@ variable "assign_ipv6_address_on_creation" {
   default     = false
   description = "Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address."
 }
+
+variable "enable_vpc_endpoint" {
+  type = bool
+  default = true
+  description = "enable vpc endpoint"
+}
