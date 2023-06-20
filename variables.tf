@@ -198,6 +198,7 @@ variable "ipv4_private_cidrs" {
 variable "single_nat_gateway" {
   type    = bool
   default = false
+  description = "Enable for only single NAT Gateway in one Availability Zone"
 }
 
 variable "assign_ipv6_address_on_creation" {

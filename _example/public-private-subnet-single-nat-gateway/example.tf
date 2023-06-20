@@ -1,10 +1,16 @@
+####----------------------------------------------------------------------------------
+## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
+####----------------------------------------------------------------------------------
 provider "aws" {
   region = "eu-west-1"
 }
 
+####----------------------------------------------------------------------------------
+## A VPC is a virtual network that closely resembles a traditional network that you'd operate in your own data center.
+####----------------------------------------------------------------------------------
 module "vpc" {
   source  = "clouddrove/vpc/aws"
-  version = "1.3.0"
+  version = "1.3.1"
 
   name        = "vpc"
   environment = "example"
@@ -13,6 +19,9 @@ module "vpc" {
   cidr_block = "10.0.0.0/16"
 }
 
+####----------------------------------------------------------------------------------
+## Subnet is a range of IP addresses in your VPC.
+####----------------------------------------------------------------------------------
 module "subnets" {
   source = "./../../"
 
@@ -22,7 +31,6 @@ module "subnets" {
   name        = "subnets"
   environment = "example"
   label_order = ["name", "environment"]
-
   availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id                          = module.vpc.vpc_id
   type                            = "public-private"
@@ -32,4 +40,3 @@ module "subnets" {
   assign_ipv6_address_on_creation = false
   enable_vpc_endpoint = false
 
-}
