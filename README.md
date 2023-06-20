@@ -165,6 +165,7 @@ Here are some examples of how you can use this module in your inventory structur
 | delimiter | Delimiter to be used between `organization`, `environment`, `name` and `attributes`. | `string` | `"-"` | no |
 | enable\_acl | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enable\_flow\_log | Enable subnet\_flow\_log logs. | `bool` | `false` | no |
+| enable\_vpc\_endpoint | enable vpc endpoint | `bool` | `true` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`). | `string` | `""` | no |
