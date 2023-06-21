@@ -60,3 +60,8 @@ output "private_acl" {
   value       = join("", aws_network_acl.private.*.id)
   description = "The ID of the network ACL."
 }
+
+output "vpc_endpoint_id" {
+  value = join("", aws_vpc_endpoint.endpoint.*.id)
+  description = "The ID of the vpc endpoint"
+}
