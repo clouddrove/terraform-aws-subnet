@@ -38,6 +38,7 @@ module "subnets" {
   cidr_block                      = module.vpc.vpc_cidr_block
   ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
   assign_ipv6_address_on_creation = false
+  public_subnet_ids               = []
   enable_vpc_endpoint             = true
   service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
 }
