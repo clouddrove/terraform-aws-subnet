@@ -41,5 +41,5 @@ module "subnets" {
   assign_ipv6_address_on_creation = false
   enable_vpc_endpoint             = true
   service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
-  enable_flow_log = false
+  enable_flow_log = true
 }
