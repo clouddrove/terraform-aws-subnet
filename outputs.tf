@@ -62,6 +62,6 @@ output "private_acl" {
 }
 
 output "vpc_endpoint_id" {
-  value = join("", aws_vpc_endpoint.endpoint.*.id)
+  value       = join("", aws_vpc_endpoint.endpoint.*.id)
   description = "The ID of the vpc endpoint"
 }

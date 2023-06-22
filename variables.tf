@@ -219,8 +219,8 @@ variable "service_name" {
 }
 
 variable "vpc_endpoint_type" {
-  type    = string
-  default = "Interface"
+  type        = string
+  default     = "Interface"
   description = "type of vpc endpoint"
 
 }

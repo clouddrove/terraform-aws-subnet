@@ -336,18 +336,12 @@ resource "aws_route_table_association" "private" {
   )
 }
 
-#Module      : VPC ENDPOINT
-#Description : Provides a resource to create A VPC endpoint to privately connect to
-#              supported AWS services and VPC endpoint services powered by AWS PrivateLink.
-
-
 resource "aws_vpc_endpoint" "endpoint" {
-  count = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
-  vpc_id       = var.vpc_id
-  service_name = var.service_name
+  count               = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  vpc_id              = var.vpc_id
+  service_name        = var.service_name
   private_dns_enabled = true
-  vpc_endpoint_type = "Interface"
-  #private_dns_only_for_inbound_resolver_endpoint = true
+  vpc_endpoint_type   = "Interface"
   tags = merge(
     module.private-labels.tags,
     {
@@ -358,13 +352,10 @@ resource "aws_vpc_endpoint" "endpoint" {
 }
 
 resource "aws_vpc_endpoint_subnet_association" "subnet_association" {
-  count = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  count           = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
   vpc_endpoint_id = join("", aws_vpc_endpoint.endpoint.*.id)
-  subnet_id = element(aws_subnet.private.*.id, count.index)
+  subnet_id       = element(aws_subnet.private.*.id, count.index)
 }
-#Module      : ROUTE
-#Description : Provides a resource to create a routing table entry (a route) in a VPC
-#              routing table.
 
 resource "aws_route" "nat_gateway" {
   count = local.nat_gateway_count > 0 ? local.nat_gateway_count : 0
