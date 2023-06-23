@@ -336,33 +336,26 @@ resource "aws_route_table_association" "private" {
   )
 }
 
-#Module      : VPC ENDPOINT
-#Description : Provides a resource to create A VPC endpoint to privately connect to
-#              supported AWS services and VPC endpoint services powered by AWS PrivateLink.
-             
-data "aws_region" "current" {}
-
-resource "aws_vpc_endpoint" "s3" {
-  count = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
-  vpc_id       = var.vpc_id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
-  route_table_ids = flatten([
-    aws_route_table.public.*.id,
-    aws_route_table.private.*.id
-  ])
-
+resource "aws_vpc_endpoint" "endpoint" {
+  count               = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  vpc_id              = var.vpc_id
+  service_name        = var.service_name
+  private_dns_enabled = true
+  vpc_endpoint_type   = "Interface"
   tags = merge(
     module.private-labels.tags,
     {
-      Name        = "endpointS3",
+      Name        = "endpoint",
       Environment = var.environment
     }
   )
 }
 
-#Module      : ROUTE
-#Description : Provides a resource to create a routing table entry (a route) in a VPC
-#              routing table.
+resource "aws_vpc_endpoint_subnet_association" "subnet_association" {
+  count           = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  vpc_endpoint_id = join("", aws_vpc_endpoint.endpoint.*.id)
+  subnet_id       = element(aws_subnet.private.*.id, count.index)
+}
 
 resource "aws_route" "nat_gateway" {
   count = local.nat_gateway_count > 0 ? local.nat_gateway_count : 0
@@ -377,7 +370,7 @@ resource "aws_route" "nat_gateway" {
 ## Provides an Elastic IP (EIP) resource..
 ##----------------------------------------------------------------------------------
 resource "aws_eip" "private" {
-  count = local.nat_gateway_count
+  count  = local.nat_gateway_count
   domain = "vpc"
   tags = merge(
     module.private-labels.tags,
@@ -411,7 +404,7 @@ resource "aws_nat_gateway" "private" {
 ## network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group or a S3 Bucket.
 ##----------------------------------------------------------------------------------
 resource "aws_flow_log" "private_subnet_flow_log" {
-  count                = var.enabled == true && var.enable_flow_log == true ? 1 : 0
+  count = var.enabled == true && var.enable_flow_log == true ? 1 : 0
 
   log_destination      = var.s3_bucket_arn
   log_destination_type = "s3"

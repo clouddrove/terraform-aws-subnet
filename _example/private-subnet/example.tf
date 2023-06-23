@@ -29,7 +29,7 @@ module "private-subnets" {
   environment = "test"
   label_order = ["name", "environment"]
 
-  nat_gateway_enabled = true
+  nat_gateway_enabled             = true
   availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id                          = module.vpc.vpc_id
   type                            = "private"
@@ -37,5 +37,4 @@ module "private-subnets" {
   ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
   public_subnet_ids               = ["subnet-xxxxxxxxxxxx", "subnet-xxxxxxxxxxxx"]
   assign_ipv6_address_on_creation = false
-  enable_vpc_endpoint = false
 }

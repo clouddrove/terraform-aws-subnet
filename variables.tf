@@ -196,8 +196,8 @@ variable "ipv4_private_cidrs" {
 }
 
 variable "single_nat_gateway" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Enable for only single NAT Gateway in one Availability Zone"
 }
 
@@ -208,7 +208,19 @@ variable "assign_ipv6_address_on_creation" {
 }
 
 variable "enable_vpc_endpoint" {
-  type = bool
-  default = true
+  type        = bool
+  default     = false
   description = "enable vpc endpoint"
+}
+variable "service_name" {
+  type        = string
+  default     = ""
+  description = "service name of vpc endpoint"
+}
+
+variable "vpc_endpoint_type" {
+  type        = string
+  default     = "Interface"
+  description = "type of vpc endpoint"
+
 }

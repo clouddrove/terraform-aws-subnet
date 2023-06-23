@@ -4,10 +4,12 @@
 provider "aws" {
   region = "eu-west-1"
 }
+data "aws_region" "current" {}
 
 ####----------------------------------------------------------------------------------
 ## A VPC is a virtual network that closely resembles a traditional network that you'd operate in your own data center.
 ####----------------------------------------------------------------------------------
+#tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
 module "vpc" {
   source  = "clouddrove/vpc/aws"
   version = "1.3.1"
@@ -16,17 +18,20 @@ module "vpc" {
   environment = "test"
   label_order = ["name", "environment"]
 
-  cidr_block = "10.0.0.0/16"
+  cidr_block            = "10.0.0.0/16"
+  flow_logs_bucket_name = "vpc-flow-logs-buckets"
+  enable_flow_log       = false
 }
 
 ####----------------------------------------------------------------------------------
 ## Subnet is a range of IP addresses in your VPC.
 ####----------------------------------------------------------------------------------
+#tfsec:ignore:aws-ec2-no-public-ip-subnet
 module "subnets" {
   source = "./../../"
 
   name        = "subnets"
-  environment = "test"
+  environment = "prashant"
   label_order = ["name", "environment"]
 
   nat_gateway_enabled             = true
@@ -37,4 +42,7 @@ module "subnets" {
   cidr_block                      = module.vpc.vpc_cidr_block
   ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
   assign_ipv6_address_on_creation = false
+  enable_vpc_endpoint             = true
+  service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
+
 }
