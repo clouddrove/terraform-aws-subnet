@@ -165,7 +165,7 @@ Here are some examples of how you can use this module in your inventory structur
 | delimiter | Delimiter to be used between `organization`, `environment`, `name` and `attributes`. | `string` | `"-"` | no |
 | enable\_acl | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enable\_flow\_log | Enable subnet\_flow\_log logs. | `bool` | `false` | no |
-| enable\_vpc\_endpoint | enable vpc endpoint | `bool` | `true` | no |
+| enable\_vpc\_endpoint | enable vpc endpoint | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`). | `string` | `""` | no |
@@ -184,10 +184,12 @@ Here are some examples of how you can use this module in your inventory structur
 | public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
 | repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-subnet"` | no |
 | s3\_bucket\_arn | S3 ARN for vpc logs. | `string` | `""` | no |
+| service\_name | service name of vpc endpoint | `string` | `""` | no |
 | single\_nat\_gateway | Enable for only single NAT Gateway in one Availability Zone | `bool` | `false` | no |
 | tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(any)` | `{}` | no |
 | traffic\_type | Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL. | `string` | `"ALL"` | no |
 | type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
+| vpc\_endpoint\_type | type of vpc endpoint | `string` | `"Interface"` | no |
 | vpc\_id | VPC ID. | `string` | n/a | yes |
 
 ## Outputs
@@ -206,6 +208,7 @@ Here are some examples of how you can use this module in your inventory structur
 | public\_subnet\_cidrs\_ipv6 | CIDR blocks of the created public subnets. |
 | public\_subnet\_id | The ID of the subnet. |
 | public\_tags | A mapping of public tags to assign to the resource. |
+| vpc\_endpoint\_id | The ID of the vpc endpoint |
 
 
 
