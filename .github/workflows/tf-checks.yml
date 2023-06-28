@@ -1,0 +1,27 @@
+name: tf-checks
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  tf-checks-private-subnet-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './_examples/private-subnet/'
+  tf-checks-basic-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './_examples/public-private-subnet-endpoint/'
+  tf-checks-public-private-subnet-single-nat-gateway-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './_examples/public-private-subnet-single-nat-gateway/'
+  tf-checks-public-private-subnet-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './_examples/public-private-subnet/'
+  tf-checks-public-subnet-example:
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
+    with:
+      working_directory: './_examples/public-subnet/'

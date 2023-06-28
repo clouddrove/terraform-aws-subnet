@@ -224,3 +224,9 @@ variable "vpc_endpoint_type" {
   description = "type of vpc endpoint"
 
 }
+
+variable "endpoint_policy" {
+  type        = string
+  default     = ""
+  description = "Generates an IAM policy document in JSON format for use with resourcesyes."
+}

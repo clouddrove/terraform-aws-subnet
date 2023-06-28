@@ -18,9 +18,9 @@ module "vpc" {
   environment = "test"
   label_order = ["name", "environment"]
 
-  cidr_block            = "10.0.0.0/16"
-  flow_logs_bucket_name = "vpc-flow-logs-buckets"
-  enable_flow_log       = false
+  cidr_block = "10.0.0.0/16"
+  #  flow_logs_bucket_name = ""
+  enable_flow_log = false
 }
 
 ####----------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ module "subnets" {
   source = "./../../"
 
   name        = "subnets"
-  environment = "prashant"
+  environment = "test"
   label_order = ["name", "environment"]
 
   nat_gateway_enabled             = true
@@ -44,5 +44,25 @@ module "subnets" {
   assign_ipv6_address_on_creation = false
   enable_vpc_endpoint             = true
   service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
+  endpoint_policy                 = data.aws_iam_policy_document.vpc_endpoint_policy.json
+}
 
+data "aws_iam_policy_document" "vpc_endpoint_policy" {
+  statement {
+    effect    = "Deny"
+    actions   = ["ec2:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+
+      values = [module.vpc.vpc_id]
+    }
+  }
 }
