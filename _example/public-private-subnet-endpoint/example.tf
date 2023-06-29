@@ -19,7 +19,7 @@ module "vpc" {
   label_order = ["name", "environment"]
 
   cidr_block = "10.0.0.0/16"
-  #  flow_logs_bucket_name = ""
+  flow_logs_bucket_name = "vpc-flow-logs-buckets"
   enable_flow_log = false
 }
 
@@ -43,7 +43,7 @@ module "subnets" {
   ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
   assign_ipv6_address_on_creation = false
   enable_vpc_endpoint             = true
-  service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
+  service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2" ## The service name can be changed according to the service.
   endpoint_policy                 = data.aws_iam_policy_document.vpc_endpoint_policy.json
 }
 
