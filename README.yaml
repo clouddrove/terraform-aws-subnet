@@ -20,7 +20,7 @@ badges:
     url: "https://github.com/clouddrove/terraform-aws-subnet/releases/latest"
   - name: "tfsec"
     image: "https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/tfsec.yml/badge.svg"
-    url: ""
+    url: "https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/tfsec.yml"
   - name: "Licence"
     image: "https://img.shields.io/badge/License-APACHE-blue.svg"
     url: "LICENSE.md"
