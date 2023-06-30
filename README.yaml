@@ -15,18 +15,15 @@ github_repo: clouddrove/terraform-aws-subnet
 
 # Badges to display
 badges:
-  - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v1.1.7-green"
-    url: "https://www.terraform.io"
-  - name: "Licence"
-    image: "https://img.shields.io/badge/License-APACHE-blue.svg"
-    url: "LICENSE.md"
+  - name: "Latest Release"
+    image: "https://img.shields.io/github/release/clouddrove/terraform-aws-subnet.svg"
+    url: "https://github.com/clouddrove/terraform-aws-subnet/releases/latest"
   - name: "tfsec"
     image: "https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/tfsec.yml/badge.svg"
     url: "https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/tfsec.yml"
-  - name: "static-checks"
-    image: "https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/terraform.yml/badge.svg"
-    url: "https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/terraform.yml"
+  - name: "Licence"
+    image: "https://img.shields.io/badge/License-APACHE-blue.svg"
+    url: "LICENSE.md"
 
 #  description of this project
 description: |-
@@ -41,7 +38,7 @@ usage: |-
   Here are some examples of how you can use this module in your inventory structure:
   ### PRIVATE SUBNET
   ```hcl
-    module "subnets" {
+    module "private-subnets" {
       source                = "clouddrove/terraform-aws-subnet/aws"
       version               = "1.3.0"
       name                  = "subnets"
@@ -65,13 +62,15 @@ usage: |-
       name                = "subnets"
       environment         = "test"
       label_order         = ["name", "environment"]
-      nat_gateway_enabled = true
-      availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-      vpc_id              = module.vpc.vpc_id
-      type                = "public-private"
-      igw_id              = module.vpc.igw_id
-      cidr_block          = module.vpc.vpc_cidr_block
-      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+
+      nat_gateway_enabled             = true
+      availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id                          = module.vpc.vpc_id
+      type                            = "public-private"
+      igw_id                          = module.vpc.igw_id
+      cidr_block                      = module.vpc.vpc_cidr_block
+      ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
+      assign_ipv6_address_on_creation = false
     }
   ```
 
@@ -91,6 +90,7 @@ usage: |-
       igw_id              = module.vpc.igw_id
       cidr_block          = module.vpc.vpc_cidr_block
       ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+      assign_ipv6_address_on_creation = false
     }
   ```
 
@@ -108,5 +108,29 @@ usage: |-
       igw_id             = module.vpc.igw_id
       cidr_block         = module.vpc.vpc_cidr_block
       ipv6_cidr_block    = module.vpc.ipv6_cidr_block
+      assign_ipv6_address_on_creation = false
+
+    }
+  ```
+
+  ### PUBLIC-PRIVATE-SUBNET-ENDPOINT
+  ```hcl
+    module "subnets" {
+      source             = "clouddrove/terraform-aws-subnet/aws"
+      version            = "1.3.0"
+      name        = "subnets"
+      environment = "prashant"
+      label_order = ["name", "environment"]
+
+      nat_gateway_enabled             = true
+      availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id                          = module.vpc.vpc_id
+      type                            = "public-private"
+      igw_id                          = module.vpc.igw_id
+      cidr_block                      = module.vpc.vpc_cidr_block
+      ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
+      assign_ipv6_address_on_creation = false
+      enable_vpc_endpoint             = true
+      service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
     }
   ```

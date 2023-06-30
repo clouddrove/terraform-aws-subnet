@@ -5,6 +5,17 @@
 
 version: 2
 updates:
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 3
+    assignees:
+      - "clouddrove-ci"
+    reviewers:
+      - "approvers"
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
@@ -15,8 +26,11 @@ updates:
     # Add reviewer
     reviewers:
       - "approvers"
+    # Allow up to 3 open pull requests for pip dependencies
+    open-pull-requests-limit: 3
+
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "_example/private-subnet" # Location of package manifests
+    directory: "/_example/private-subnet" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -25,8 +39,11 @@ updates:
     # Add reviewer
     reviewers:
       - "approvers"
+    # Allow up to 3 open pull requests for pip dependencies
+    open-pull-requests-limit: 3
+
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "_example/public-private-subnet" # Location of package manifests
+    directory: "/_example/public-private-subnet-endpoint" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -35,18 +52,11 @@ updates:
     # Add reviewer
     reviewers:
       - "approvers"
+    # Allow up to 3 open pull requests for pip dependencies
+    open-pull-requests-limit: 3
+
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "_example/public-private-subnet-single-nat-gateway" # Location of package manifests
-    schedule:
-        interval: "weekly"
-    # Add assignees
-    assignees:
-      - "clouddrove-ci"
-    # Add reviewer
-    reviewers:
-      - "approvers"
-  - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "_example/public-subnet" # Location of package manifests
+    directory: "/_example/public-private-subnet-single-nat-gateway" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -55,3 +65,31 @@ updates:
     # Add reviewer
     reviewers:
       - "approvers"
+    # Allow up to 3 open pull requests for pip dependencies
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: "terraform" # See documentation for possible values
+    directory: "/_example/public-private-subnet" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    # Add assignees
+    assignees:
+      - "clouddrove-ci"
+    # Add reviewer
+    reviewers:
+      - "approvers"
+    # Allow up to 3 open pull requests for pip dependencies
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: "terraform" # See documentation for possible values
+    directory: "/_example/public-subnet" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    # Add assignees
+    assignees:
+      - "clouddrove-ci"
+    # Add reviewer
+    reviewers:
+      - "approvers"
+    # Allow up to 3 open pull requests for pip dependencies
+    open-pull-requests-limit: 3

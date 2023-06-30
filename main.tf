@@ -337,9 +337,11 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_vpc_endpoint" "endpoint" {
-  count               = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
-  vpc_id              = var.vpc_id
-  service_name        = var.service_name
+  count        = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  vpc_id       = var.vpc_id
+  service_name = var.service_name
+  policy       = var.endpoint_policy
+
   private_dns_enabled = true
   vpc_endpoint_type   = "Interface"
   tags = merge(
@@ -417,3 +419,4 @@ resource "aws_flow_log" "private_subnet_flow_log" {
     }
   )
 }
+
