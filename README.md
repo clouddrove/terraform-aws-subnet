@@ -13,17 +13,14 @@
 
 <p align="center">
 
-<a href="https://www.terraform.io">
-  <img src="https://img.shields.io/badge/Terraform-v1.1.7-green" alt="Terraform">
-</a>
-<a href="LICENSE.md">
-  <img src="https://img.shields.io/badge/License-APACHE-blue.svg" alt="Licence">
+<a href="https://github.com/clouddrove/terraform-aws-subnet/releases/latest">
+  <img src="https://img.shields.io/github/release/clouddrove/terraform-aws-subnet.svg" alt="Latest Release">
 </a>
 <a href="https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/tfsec.yml">
   <img src="https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/tfsec.yml/badge.svg" alt="tfsec">
 </a>
-<a href="https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/terraform.yml">
-  <img src="https://github.com/clouddrove/terraform-aws-subnet/actions/workflows/terraform.yml/badge.svg" alt="static-checks">
+<a href="LICENSE.md">
+  <img src="https://img.shields.io/badge/License-APACHE-blue.svg" alt="Licence">
 </a>
 
 
@@ -77,7 +74,7 @@ This module has a few dependencies:
 Here are some examples of how you can use this module in your inventory structure:
 ### PRIVATE SUBNET
 ```hcl
-  module "subnets" {
+  module "private-subnets" {
     source                = "clouddrove/terraform-aws-subnet/aws"
     version               = "1.3.0"
     name                  = "subnets"
@@ -101,13 +98,15 @@ Here are some examples of how you can use this module in your inventory structur
     name                = "subnets"
     environment         = "test"
     label_order         = ["name", "environment"]
-    nat_gateway_enabled = true
-    availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-    vpc_id              = module.vpc.vpc_id
-    type                = "public-private"
-    igw_id              = module.vpc.igw_id
-    cidr_block          = module.vpc.vpc_cidr_block
-    ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+
+    nat_gateway_enabled             = true
+    availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id                          = module.vpc.vpc_id
+    type                            = "public-private"
+    igw_id                          = module.vpc.igw_id
+    cidr_block                      = module.vpc.vpc_cidr_block
+    ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
+    assign_ipv6_address_on_creation = false
   }
 ```
 
@@ -127,6 +126,7 @@ Here are some examples of how you can use this module in your inventory structur
     igw_id              = module.vpc.igw_id
     cidr_block          = module.vpc.vpc_cidr_block
     ipv6_cidr_block     = module.vpc.ipv6_cidr_block
+    assign_ipv6_address_on_creation = false
   }
 ```
 
@@ -144,6 +144,30 @@ Here are some examples of how you can use this module in your inventory structur
     igw_id             = module.vpc.igw_id
     cidr_block         = module.vpc.vpc_cidr_block
     ipv6_cidr_block    = module.vpc.ipv6_cidr_block
+    assign_ipv6_address_on_creation = false
+
+  }
+```
+
+### PUBLIC-PRIVATE-SUBNET-ENDPOINT
+```hcl
+  module "subnets" {
+    source             = "clouddrove/terraform-aws-subnet/aws"
+    version            = "1.3.0"
+    name        = "subnets"
+    environment = "prashant"
+    label_order = ["name", "environment"]
+
+    nat_gateway_enabled             = true
+    availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    vpc_id                          = module.vpc.vpc_id
+    type                            = "public-private"
+    igw_id                          = module.vpc.igw_id
+    cidr_block                      = module.vpc.vpc_cidr_block
+    ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
+    assign_ipv6_address_on_creation = false
+    enable_vpc_endpoint             = true
+    service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
   }
 ```
 
@@ -167,6 +191,7 @@ Here are some examples of how you can use this module in your inventory structur
 | enable\_flow\_log | Enable subnet\_flow\_log logs. | `bool` | `false` | no |
 | enable\_vpc\_endpoint | enable vpc endpoint | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
+| endpoint\_policy | Generates an IAM policy document in JSON format for use with resourcesyes. | `string` | `""` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`). | `string` | `""` | no |
 | ipv4\_private\_cidrs | Subnet CIDR blocks (e.g. `10.0.0.0/16`). | `list(any)` | `[]` | no |
