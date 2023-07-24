@@ -3,7 +3,7 @@
 variable "name" {
   type        = string
   default     = ""
-  description = "Name  (e.g. `app` or `cluster`)."
+  description = "Name  (e.g. `prod-subnet` or `subnet`)."
 }
 
 variable "repository" {
@@ -27,7 +27,7 @@ variable "environment" {
 variable "label_order" {
   type        = list(any)
   default     = []
-  description = "Label order, e.g. `name`,`application`."
+  description = "Label order, e.g. `name`,`Environment`."
 }
 
 variable "attributes" {
