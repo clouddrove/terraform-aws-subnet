@@ -5,7 +5,6 @@ provider "aws" {
   region = "eu-west-1"
 }
 data "aws_region" "current" {}
-
 ####----------------------------------------------------------------------------------
 ## A VPC is a virtual network that closely resembles a traditional network that you'd operate in your own data center.
 ####----------------------------------------------------------------------------------
@@ -21,7 +20,6 @@ module "vpc" {
   cidr_block      = "10.0.0.0/16"
   enable_flow_log = false
 }
-
 ####----------------------------------------------------------------------------------
 ## Subnet is a range of IP addresses in your VPC.
 ####----------------------------------------------------------------------------------

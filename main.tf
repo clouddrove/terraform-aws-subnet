@@ -8,7 +8,6 @@ locals {
   private_count              = var.enabled == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
   nat_gateway_count          = var.single_nat_gateway ? 1 : local.private_nat_gateways_count
 }
-
 ##----------------------------------------------------------------------------------
 ## labels use by PRIVATE MODULE
 ## This terraform module is designed to generate consistent label names and
@@ -28,11 +27,9 @@ module "private-labels" {
     Type = "private"
   }
 }
-
 ##----------------------------------------------------------------------------------
 ## labels use by PUBLIC MODULE
 ##----------------------------------------------------------------------------------
-
 module "public-labels" {
   source  = "clouddrove/labels/aws"
   version = "1.3.0"
@@ -47,7 +44,6 @@ module "public-labels" {
     Type = "public"
   }
 }
-
 ##----------------------------------------------------------------------------------
 ## PUBLIC SUBNET
 ## aws-subnet resource to create public, private and public-private subnet with
@@ -90,7 +86,6 @@ resource "aws_subnet" "public" {
     ]
   }
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides an network ACL resource. You might set up network ACLs with rules
 ## similar to your security groups in order to add an additional layer of security to your VPC.
@@ -139,7 +134,6 @@ resource "aws_network_acl" "public" {
   tags       = module.public-labels.tags
   depends_on = [aws_subnet.public]
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create a VPC ROUTE TABLE.
 ##----------------------------------------------------------------------------------
@@ -156,7 +150,6 @@ resource "aws_route_table" "public" {
     }
   )
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create a routing table entry (A ROUTE) in a VPC.
 ##----------------------------------------------------------------------------------
@@ -168,7 +161,6 @@ resource "aws_route" "public" {
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.public]
 }
-
 resource "aws_route" "public_ipv6" {
   count = local.public_count
 
@@ -177,7 +169,6 @@ resource "aws_route" "public_ipv6" {
   destination_ipv6_cidr_block = "::/0"
   depends_on                  = [aws_route_table.public]
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create an association between a subnet and routing table.
 ##----------------------------------------------------------------------------------
@@ -193,7 +184,6 @@ resource "aws_route_table_association" "public" {
     aws_route_table.public,
   ]
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a VPC/Subnet/ENI Flow Log to capture IP traffic for a specific
 ## network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group or a S3 Bucket.
@@ -212,7 +202,6 @@ resource "aws_flow_log" "flow_log" {
     }
   )
 }
-
 ##----------------------------------------------------------------------------------
 ## PRIVATE SUBNET
 ## Terraform module to create public, private and public-private subnet with
@@ -256,7 +245,6 @@ resource "aws_subnet" "private" {
     ]
   }
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides an network ACL resource. You might set up network ACLs with rules
 ## similar to your security groups in order to add an additional layer of ecurity to your VPC.
@@ -306,7 +294,6 @@ resource "aws_network_acl" "private" {
   tags       = module.private-labels.tags
   depends_on = [aws_subnet.private]
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create a VPC ROUTEING TABLE.
 ##----------------------------------------------------------------------------------
@@ -322,7 +309,6 @@ resource "aws_route_table" "private" {
     }
   )
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create an ASSOCIATION between a subnet and routing table.
 ##----------------------------------------------------------------------------------
@@ -367,7 +353,6 @@ resource "aws_route" "nat_gateway" {
   nat_gateway_id         = element(aws_nat_gateway.private.*.id, count.index)
   depends_on             = [aws_route_table.private]
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides an Elastic IP (EIP) resource..
 ##----------------------------------------------------------------------------------
@@ -384,7 +369,6 @@ resource "aws_eip" "private" {
     create_before_destroy = true
   }
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create a VPC NAT GATEWAY.
 ##----------------------------------------------------------------------------------
@@ -400,7 +384,6 @@ resource "aws_nat_gateway" "private" {
     }
   )
 }
-
 ##----------------------------------------------------------------------------------
 ## Provides a VPC/Subnet/ENI Flow Log to capture IP traffic for a specific
 ## network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group or a S3 Bucket.
@@ -419,4 +402,3 @@ resource "aws_flow_log" "private_subnet_flow_log" {
     }
   )
 }
-

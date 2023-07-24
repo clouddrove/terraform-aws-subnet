@@ -3,9 +3,8 @@ on:
   push:
     branches:
       - master
-
 jobs:
-  readme-create:
+  readme:
     name: 'readme-create'
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +39,7 @@ jobs:
         with:
           actions_subcommand: 'push'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Slack Notification'
         uses: clouddrove/action-slack@v2
