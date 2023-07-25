@@ -2,7 +2,7 @@
 ## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
 ####----------------------------------------------------------------------------------
 provider "aws" {
-  region = "eu-west-1"
+  region = "us-east-1"
 }
 ####----------------------------------------------------------------------------------
 ## A VPC is a virtual network that closely resembles a traditional network that you'd operate in your own data center.
@@ -32,5 +32,6 @@ module "subnets" {
   igw_id                          = module.vpc.igw_id
   cidr_block                      = module.vpc.vpc_cidr_block
   ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
-  assign_ipv6_address_on_creation = false
+  public_subnet_assign_ipv6_address_on_creation = true
+  enable_ipv6 = true
 }

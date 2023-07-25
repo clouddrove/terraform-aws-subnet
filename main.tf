@@ -3,9 +3,9 @@
 ## It mainly serves the purpose of reducing duplication within the Terraform code.
 ##----------------------------------------------------------------------------------
 locals {
-  public_count               = var.enabled == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
-  private_nat_gateways_count = var.enabled == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
-  private_count              = var.enabled == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
+  public_count               = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
+  private_nat_gateways_count = var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0
+  private_count              = var.enable == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
   nat_gateway_count          = var.single_nat_gateway ? 1 : local.private_nat_gateways_count
 }
 ##----------------------------------------------------------------------------------
@@ -50,25 +50,18 @@ module "public-labels" {
 ## network acl, route table, Elastic IP, nat gateway, flow log.
 ##----------------------------------------------------------------------------------
 resource "aws_subnet" "public" {
-  count = local.public_count
-
-  vpc_id            = var.vpc_id
-  availability_zone = element(var.availability_zones, count.index)
-
-  cidr_block = length(var.ipv4_public_cidrs) == 0 ? cidrsubnet(
-    signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
-    ceil(log(local.public_count * 2, 2)),
-    local.public_count + count.index
-  ) : var.ipv4_public_cidrs[count.index]
-
-  ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
-    signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
-    8,
-    local.public_count + count.index
-  ) : var.ipv6_cidrs[count.index]
-  map_public_ip_on_launch         = var.map_public_ip_on_launch
-  assign_ipv6_address_on_creation = var.assign_ipv6_address_on_creation
-
+  count                                          = local.public_count 
+  vpc_id                                         = var.vpc_id
+  availability_zone                              = element(var.availability_zones, count.index)
+  cidr_block                                     = length(var.ipv4_public_cidrs) == 0 ? cidrsubnet(var.cidr_block, ceil(log(local.public_count * 2, 2)), local.public_count + count.index) : var.ipv4_public_cidrs[count.index]
+  ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.public_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 8, local.public_count + count.index) : var.public_ipv6_cidrs[count.index]) : null
+  map_public_ip_on_launch                        = var.map_public_ip_on_launch
+  assign_ipv6_address_on_creation                = var.enable_ipv6 && var.public_subnet_ipv6_native ? true : var.public_subnet_assign_ipv6_address_on_creation
+  private_dns_hostname_type_on_launch            = var.public_subnet_private_dns_hostname_type_on_launch
+  ipv6_native                                    = var.enable_ipv6 && var.public_subnet_ipv6_native
+  enable_resource_name_dns_aaaa_record_on_launch = var.enable_ipv6 && var.public_subnet_enable_resource_name_dns_aaaa_record_on_launch
+  enable_resource_name_dns_a_record_on_launch    = !var.public_subnet_ipv6_native && var.public_subnet_enable_resource_name_dns_a_record_on_launch
+  enable_dns64                                   = var.enable_ipv6 && var.public_subnet_enable_dns64
   tags = merge(
     module.public-labels.tags, var.tags,
     {
@@ -76,7 +69,6 @@ resource "aws_subnet" "public" {
       "AZ"   = element(var.availability_zones, count.index)
     }
   )
-
   lifecycle {
     # Ignore tags added by kubernetes
     ignore_changes = [
@@ -91,57 +83,48 @@ resource "aws_subnet" "public" {
 ## similar to your security groups in order to add an additional layer of security to your VPC.
 ##----------------------------------------------------------------------------------
 resource "aws_network_acl" "public" {
-  count = var.enabled == true && var.enable_acl == true && (var.type == "public" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
-
+  count = var.enable && local.public_count > 0 && var.enable_public_acl && (var.type == "public" || var.type == "public-private") ? 1 : 0
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.public.*.id
-
-  egress {
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-    protocol   = "-1"
-  }
-
-  egress {
-    rule_no         = 101
-    action          = "allow"
-    ipv6_cidr_block = "::/0"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-  }
-
-  ingress {
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-    protocol   = "-1"
-  }
-
-  ingress {
-    rule_no         = 101
-    action          = "allow"
-    ipv6_cidr_block = "::/0"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-  }
   tags       = module.public-labels.tags
   depends_on = [aws_subnet.public]
+}
+
+resource "aws_network_acl_rule" "public_inbound" {
+  count = var.enable && local.public_count > 0 && var.enable_public_acl && (var.type == "public" || var.type == "public-private") ? length(var.public_inbound_acl_rules) : 0
+  network_acl_id = aws_network_acl.public[0].id
+  egress          = false
+  rule_number     = var.public_inbound_acl_rules[count.index]["rule_number"]
+  rule_action     = var.public_inbound_acl_rules[count.index]["rule_action"]
+  from_port       = lookup(var.public_inbound_acl_rules[count.index], "from_port", null)
+  to_port         = lookup(var.public_inbound_acl_rules[count.index], "to_port", null)
+  icmp_code       = lookup(var.public_inbound_acl_rules[count.index], "icmp_code", null)
+  icmp_type       = lookup(var.public_inbound_acl_rules[count.index], "icmp_type", null)
+  protocol        = var.public_inbound_acl_rules[count.index]["protocol"]
+  cidr_block      = lookup(var.public_inbound_acl_rules[count.index], "cidr_block", null)
+  ipv6_cidr_block = lookup(var.public_inbound_acl_rules[count.index], "ipv6_cidr_block", null)
+}
+
+resource "aws_network_acl_rule" "public_outbound" {
+  count = var.enable && local.public_count > 0 && var.enable_public_acl && (var.type == "public" || var.type == "public-private") ? length(var.public_outbound_acl_rules) : 0
+  network_acl_id = aws_network_acl.public[0].id
+  egress          = true
+  rule_number     = var.public_outbound_acl_rules[count.index]["rule_number"]
+  rule_action     = var.public_outbound_acl_rules[count.index]["rule_action"]
+  from_port       = lookup(var.public_outbound_acl_rules[count.index], "from_port", null)
+  to_port         = lookup(var.public_outbound_acl_rules[count.index], "to_port", null)
+  icmp_code       = lookup(var.public_outbound_acl_rules[count.index], "icmp_code", null)
+  icmp_type       = lookup(var.public_outbound_acl_rules[count.index], "icmp_type", null)
+  protocol        = var.public_outbound_acl_rules[count.index]["protocol"]
+  cidr_block      = lookup(var.public_outbound_acl_rules[count.index], "cidr_block", null)
+  ipv6_cidr_block = lookup(var.public_outbound_acl_rules[count.index], "ipv6_cidr_block", null)
 }
 ##----------------------------------------------------------------------------------
 ## Provides a resource to create a VPC ROUTE TABLE.
 ##----------------------------------------------------------------------------------
 resource "aws_route_table" "public" {
   count = local.public_count
-
   vpc_id = var.vpc_id
-
   tags = merge(
     module.public-labels.tags,
     {
@@ -155,11 +138,13 @@ resource "aws_route_table" "public" {
 ##----------------------------------------------------------------------------------
 resource "aws_route" "public" {
   count = local.public_count
-
   route_table_id         = element(aws_route_table.public.*.id, count.index)
   gateway_id             = var.igw_id
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.public]
+    timeouts {
+    create = "5m"
+  }
 }
 resource "aws_route" "public_ipv6" {
   count = local.public_count
@@ -189,7 +174,7 @@ resource "aws_route_table_association" "public" {
 ## network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group or a S3 Bucket.
 ##----------------------------------------------------------------------------------
 resource "aws_flow_log" "flow_log" {
-  count = var.enabled == true && var.enable_flow_log == true ? 1 : 0
+  count = var.enable == true && var.enable_flow_log == true ? 1 : 0
 
   log_destination      = var.s3_bucket_arn
   log_destination_type = "s3"
@@ -209,23 +194,22 @@ resource "aws_flow_log" "flow_log" {
 ##----------------------------------------------------------------------------------
 resource "aws_subnet" "private" {
   count = local.private_count
-
-  vpc_id            = var.vpc_id
-  availability_zone = element(var.availability_zones, count.index)
-
-  cidr_block = length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(
-    signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,
-    local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)),
-    count.index
-  ) : var.ipv4_private_cidrs[count.index]
-
-  ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(
-    signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,
-    8,
-    count.index
-  ) : var.ipv6_cidrs[count.index]
-
-  assign_ipv6_address_on_creation = false
+  # vpc_id            = var.vpc_id
+  # availability_zone = element(var.availability_zones, count.index)
+  # cidr_block = length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(signum(length(var.cidr_block)) == 1 ? var.cidr_block : var.cidr_block,local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)),count.index) : var.ipv4_private_cidrs[count.index]
+  # ipv6_cidr_block = length(var.ipv6_cidrs) == 0 ? cidrsubnet(signum(length(var.ipv6_cidr_block)) == 1 ? var.ipv6_cidr_block : var.ipv6_cidr_block,8,count.index) : var.ipv6_cidrs[count.index]
+  # assign_ipv6_address_on_creation = false
+  vpc_id                                         = var.vpc_id
+  availability_zone                              = element(var.availability_zones, count.index)
+  cidr_block                                     = length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(var.cidr_block,local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)),count.index) : var.ipv4_private_cidrs[count.index]
+  ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.private_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 8, local.public_count + count.index) : var.private_ipv6_cidrs[count.index]) : null
+  map_public_ip_on_launch                        = var.map_private_ip_on_launch
+  assign_ipv6_address_on_creation                = var.enable_ipv6 && var.private_subnet_ipv6_native ? true : var.private_subnet_assign_ipv6_address_on_creation
+  private_dns_hostname_type_on_launch            = var.private_subnet_private_dns_hostname_type_on_launch
+  ipv6_native                                    = var.enable_ipv6 && var.private_subnet_ipv6_native
+  enable_resource_name_dns_aaaa_record_on_launch = var.enable_ipv6 && var.private_subnet_enable_resource_name_dns_aaaa_record_on_launch
+  enable_resource_name_dns_a_record_on_launch    = !var.private_subnet_ipv6_native && var.private_subnet_enable_resource_name_dns_a_record_on_launch
+  enable_dns64                                   = var.enable_ipv6 && var.private_subnet_enable_dns64
 
   tags = merge(
     module.private-labels.tags,
@@ -250,7 +234,7 @@ resource "aws_subnet" "private" {
 ## similar to your security groups in order to add an additional layer of ecurity to your VPC.
 ##----------------------------------------------------------------------------------
 resource "aws_network_acl" "private" {
-  count = var.enabled == true && var.enable_acl == true && (var.type == "private" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
+  count = var.enable == true && var.enable_acl == true && (var.type == "private" || var.type == "public-private") && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0
 
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
@@ -323,7 +307,7 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_vpc_endpoint" "endpoint" {
-  count        = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  count        = var.enable == true && var.enable_vpc_endpoint == true ? 1 : 0
   vpc_id       = var.vpc_id
   service_name = var.service_name
   policy       = var.endpoint_policy
@@ -340,7 +324,7 @@ resource "aws_vpc_endpoint" "endpoint" {
 }
 
 resource "aws_vpc_endpoint_subnet_association" "subnet_association" {
-  count           = var.enabled == true && var.enable_vpc_endpoint == true ? 1 : 0
+  count           = var.enable == true && var.enable_vpc_endpoint == true ? 1 : 0
   vpc_endpoint_id = join("", aws_vpc_endpoint.endpoint.*.id)
   subnet_id       = element(aws_subnet.private.*.id, count.index)
 }
@@ -389,7 +373,7 @@ resource "aws_nat_gateway" "private" {
 ## network interface, subnet, or VPC. Logs are sent to a CloudWatch Log Group or a S3 Bucket.
 ##----------------------------------------------------------------------------------
 resource "aws_flow_log" "private_subnet_flow_log" {
-  count = var.enabled == true && var.enable_flow_log == true ? 1 : 0
+  count = var.enable == true && var.enable_flow_log == true ? 1 : 0
 
   log_destination      = var.s3_bucket_arn
   log_destination_type = "s3"

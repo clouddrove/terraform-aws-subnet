@@ -127,13 +127,13 @@ variable "private_network_acl_id" {
   sensitive   = true
 }
 
-variable "enabled" {
+variable "enable" {
   type        = bool
   default     = true
   description = "Set to false to prevent the module from creating any resources."
 }
 
-variable "enable_acl" {
+variable "enable_public_acl" {
   type        = bool
   default     = true
   description = "Set to false to prevent the module from creating any resources."
@@ -160,7 +160,13 @@ variable "enable_flow_log" {
 variable "map_public_ip_on_launch" {
   type        = bool
   default     = true
-  description = "Specify true to indicate that instances launched into the subnet should be assigned a public IP address."
+  description = "Specify true to indicate that instances launched into the public subnet should be assigned a public IP address."
+}
+
+variable "map_private_ip_on_launch" {
+  type        = bool
+  default     = true
+  description = "Specify true to indicate that instances launched into the private subnet should be assigned a public IP address."
 }
 
 #Module      : FLOW LOG
@@ -178,10 +184,16 @@ variable "traffic_type" {
   description = "Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL."
 }
 
-variable "ipv6_cidrs" {
+variable "public_ipv6_cidrs" {
   type        = list(any)
   default     = []
-  description = "Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
+  description = "Public Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
+}
+
+variable "private_ipv6_cidrs" {
+  type        = list(any)
+  default     = []
+  description = "Private Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
 }
 
 variable "ipv4_public_cidrs" {
@@ -201,7 +213,13 @@ variable "single_nat_gateway" {
   description = "Enable for only single NAT Gateway in one Availability Zone"
 }
 
-variable "assign_ipv6_address_on_creation" {
+variable "public_subnet_assign_ipv6_address_on_creation" {
+  type        = bool
+  default     = false
+  description = "Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address."
+}
+
+variable "private_subnet_assign_ipv6_address_on_creation" {
   type        = bool
   default     = false
   description = "Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address."
@@ -229,4 +247,100 @@ variable "endpoint_policy" {
   type        = string
   default     = ""
   description = "Generates an IAM policy document in JSON format for use with resourcesyes."
+}
+
+variable "public_subnet_private_dns_hostname_type_on_launch" {
+  type        = string
+  default     = null
+  description = "The type of hostnames to assign to instances in the subnet at launch. For IPv6-only subnets, an instance DNS name must be based on the instance ID. For dual-stack and IPv4-only subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID. Valid values: `ip-name`, `resource-name`"
+}
+
+variable "private_subnet_private_dns_hostname_type_on_launch" {
+  type        = string
+  default     = null
+  description = "The type of hostnames to assign to instances in the subnet at launch. For IPv6-only subnets, an instance DNS name must be based on the instance ID. For dual-stack and IPv4-only subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID. Valid values: `ip-name`, `resource-name`"
+}
+
+variable "public_subnet_ipv6_native" {
+  type        = bool
+  default     = false
+  description = "Indicates whether to create an IPv6-only public subnet. Default: `false`"
+}
+
+variable "private_subnet_ipv6_native" {
+  type        = bool
+  default     = false
+  description = "Indicates whether to create an IPv6-only private subnet. Default: `false`"
+}
+
+variable "enable_ipv6" {
+  type        = bool
+  default     = false
+  description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block"
+}
+
+variable "public_subnet_enable_dns64" {
+  type        = bool
+  default     = false
+  description = "Indicates whether DNS queries made to the Amazon-provided DNS Resolver in this subnet should return synthetic IPv6 addresses for IPv4-only destinations. Default: `true`"
+}
+
+variable "private_subnet_enable_dns64" {
+  type        = bool
+  default     = false
+  description = "Indicates whether DNS queries made to the Amazon-provided DNS Resolver in this subnet should return synthetic IPv6 addresses for IPv4-only destinations. Default: `true`"
+}
+
+variable "public_subnet_enable_resource_name_dns_a_record_on_launch" {
+  type        = bool
+  default     = false
+  description = "Indicates whether to respond to DNS queries for instance hostnames with DNS A records. Default: `false`"
+}
+
+variable "private_subnet_enable_resource_name_dns_a_record_on_launch" {
+  type        = bool
+  default     = false
+  description = "Indicates whether to respond to DNS queries for instance hostnames with DNS A records. Default: `false`"
+}
+
+variable "public_subnet_enable_resource_name_dns_aaaa_record_on_launch" {
+  type        = bool
+  default     = false
+  description = "Indicates whether to respond to DNS queries for instance hostnames with DNS AAAA records. Default: `true`"
+}
+
+variable "private_subnet_enable_resource_name_dns_aaaa_record_on_launch" {
+  type        = bool
+  default     = false
+  description = "Indicates whether to respond to DNS queries for instance hostnames with DNS AAAA records. Default: `true`"
+}
+
+variable "public_inbound_acl_rules" {
+  type        = list(map(string))
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+  description = "Public subnets inbound network ACLs"
+}
+
+variable "public_outbound_acl_rules" {
+  type        = list(map(string))
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+  description = "Public subnets outbound network ACLs"
 }
