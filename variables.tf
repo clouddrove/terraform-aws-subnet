@@ -144,17 +144,59 @@ variable "map_private_ip_on_launch" {
 
 #Module      : FLOW LOG
 #Description : Terraform flow log module variables.
-variable "s3_bucket_arn" {
+variable "flow_log_destination_arn" {
   type        = string
-  default     = ""
-  description = "S3 ARN for vpc logs."
+  default     = null
+  description = "ARN of resource in which flow log will be sent."
   sensitive   = true
 }
 
-variable "traffic_type" {
+variable "flow_log_destination_type" {
+  type        = string
+  default     = "cloud-watch-logs"
+  description = "Type of flow log destination. Can be s3 or cloud-watch-logs"
+}
+
+variable "flow_log_traffic_type" {
   type        = string
   default     = "ALL"
   description = "Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL."
+}
+
+variable "flow_log_log_format" {
+  type        = string
+  default     = null
+  description = "The fields to include in the flow log record, in the order in which they should appear"
+}
+
+variable "flow_log_iam_role_arn" {
+  type        = string
+  default     = null
+  description = "The ARN for the IAM role that's used to post flow logs to a CloudWatch Logs log group. When flow_log_destination_arn is set to ARN of Cloudwatch Logs, this argument needs to be provided"
+}
+
+variable "flow_log_max_aggregation_interval" {
+  type        = number
+  default     = 600
+  description = "The maximum interval of time during which a flow of packets is captured and aggregated into a flow log record. Valid Values: `60` seconds or `600` seconds"
+}
+
+variable "flow_log_file_format" {
+  type        = string
+  default     = null
+  description = "(Optional) The format for the flow log. Valid values: `plain-text`, `parquet`"
+}
+
+variable "flow_log_hive_compatible_partitions" {
+  type        = bool
+  default     = false
+  description = "(Optional) Indicates whether to use Hive-compatible prefixes for flow logs stored in Amazon S3"
+}
+
+variable "flow_log_per_hour_partition" {
+  type        = bool
+  default     = false
+  description = "(Optional) Indicates whether to partition the flow log per hour. This reduces the cost and response time for queries"
 }
 
 variable "public_ipv6_cidrs" {

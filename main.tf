@@ -164,11 +164,23 @@ resource "aws_route_table_association" "public" {
 ## Below resource will deploy flow logs for public subnet. 
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "public_subnet_flow_log" {
-  count                = var.enable == true && var.enable_flow_log == true ? 1 : 0
-  log_destination      = var.s3_bucket_arn
-  log_destination_type = "s3"
-  traffic_type         = var.traffic_type
-  subnet_id            = element(aws_subnet.public.*.id, count.index)
+  count                    = var.enable && var.enable_flow_log && local.public_count > 0 ? 1 : 0
+  log_destination_type     = var.flow_log_destination_type
+  log_destination          = var.flow_log_destination_arn
+  log_format               = var.flow_log_log_format
+  iam_role_arn             = var.flow_log_iam_role_arn
+  traffic_type             = var.flow_log_traffic_type
+  subnet_id                = element(aws_subnet.public.*.id, count.index)
+  max_aggregation_interval = var.flow_log_max_aggregation_interval
+  dynamic "destination_options" {
+    for_each = var.flow_log_destination_type == "s3" ? [true] : []
+
+    content {
+      file_format                = var.flow_log_file_format
+      hive_compatible_partitions = var.flow_log_hive_compatible_partitions
+      per_hour_partition         = var.flow_log_per_hour_partition
+    }
+  }
   tags = merge(
     module.public-labels.tags,
     {
@@ -304,14 +316,13 @@ resource "aws_eip" "private" {
 ## Below resource will deploy nat gateway for private subnets. 
 ##----------------------------------------------------------------------------------
 resource "aws_nat_gateway" "private" {
-  count = local.nat_gateway_count
-
+  count         = local.nat_gateway_count
   allocation_id = element(aws_eip.private.*.id, count.index)
   subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public.*.id, count.index) : element(var.public_subnet_ids, count.index)
   tags = merge(
     module.private-labels.tags,
     {
-      "Name" = format("%s%s%s-ng", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
+      "Name" = format("%s%s%s-nat-gateway", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
     }
   )
 }
@@ -320,12 +331,23 @@ resource "aws_nat_gateway" "private" {
 ## Below resource will deploy flow logs for private subnet. 
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "private_subnet_flow_log" {
-  count = var.enable == true && var.enable_flow_log == true ? 1 : 0
+  count                    = var.enable && var.enable_flow_log && local.private_count > 0 ? 1 : 0
+  log_destination_type     = var.flow_log_destination_type
+  log_destination          = var.flow_log_destination_arn
+  log_format               = var.flow_log_log_format
+  iam_role_arn             = var.flow_log_iam_role_arn
+  traffic_type             = var.flow_log_traffic_type
+  subnet_id                = element(aws_subnet.private.*.id, count.index)
+  max_aggregation_interval = var.flow_log_max_aggregation_interval
+  dynamic "destination_options" {
+    for_each = var.flow_log_destination_type == "s3" ? [true] : []
 
-  log_destination      = var.s3_bucket_arn
-  log_destination_type = "s3"
-  traffic_type         = var.traffic_type
-  subnet_id            = element(aws_subnet.private.*.id, count.index)
+    content {
+      file_format                = var.flow_log_file_format
+      hive_compatible_partitions = var.flow_log_hive_compatible_partitions
+      per_hour_partition         = var.flow_log_per_hour_partition
+    }
+  }
   tags = merge(
     module.private-labels.tags,
     {
