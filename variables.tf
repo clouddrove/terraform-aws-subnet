@@ -62,12 +62,6 @@ variable "availability_zones" {
   description = "List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)."
 }
 
-variable "max_subnets" {
-  type        = number
-  default     = 6
-  description = "Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation."
-}
-
 variable "type" {
   type        = string
   default     = ""
@@ -106,27 +100,6 @@ variable "igw_id" {
   sensitive   = true
 }
 
-variable "az_ngw_ids" {
-  type        = map(string)
-  default     = {}
-  description = "Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets."
-  sensitive   = true
-}
-
-variable "public_network_acl_id" {
-  type        = string
-  default     = ""
-  description = "Network ACL ID that is added to the public subnets. If empty, a new ACL will be created."
-  sensitive   = true
-}
-
-variable "private_network_acl_id" {
-  type        = string
-  default     = ""
-  description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created."
-  sensitive   = true
-}
-
 variable "enable" {
   type        = bool
   default     = true
@@ -139,16 +112,16 @@ variable "enable_public_acl" {
   description = "Set to false to prevent the module from creating any resources."
 }
 
+variable "enable_private_acl" {
+  type        = bool
+  default     = true
+  description = "Set to false to prevent the module from creating any resources."
+}
+
 variable "nat_gateway_enabled" {
   type        = bool
   default     = false
   description = "Flag to enable/disable NAT Gateways creation in public subnets."
-}
-
-variable "az_ngw_count" {
-  type        = number
-  default     = 0
-  description = "Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857."
 }
 
 variable "enable_flow_log" {
@@ -225,30 +198,6 @@ variable "private_subnet_assign_ipv6_address_on_creation" {
   description = "Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address."
 }
 
-variable "enable_vpc_endpoint" {
-  type        = bool
-  default     = false
-  description = "enable vpc endpoint"
-}
-variable "service_name" {
-  type        = string
-  default     = ""
-  description = "service name of vpc endpoint"
-}
-
-variable "vpc_endpoint_type" {
-  type        = string
-  default     = "Interface"
-  description = "type of vpc endpoint"
-
-}
-
-variable "endpoint_policy" {
-  type        = string
-  default     = ""
-  description = "Generates an IAM policy document in JSON format for use with resourcesyes."
-}
-
 variable "public_subnet_private_dns_hostname_type_on_launch" {
   type        = string
   default     = null
@@ -316,7 +265,7 @@ variable "private_subnet_enable_resource_name_dns_aaaa_record_on_launch" {
 }
 
 variable "public_inbound_acl_rules" {
-  type        = list(map(string))
+  type = list(map(string))
   default = [
     {
       rule_number = 100
@@ -331,7 +280,7 @@ variable "public_inbound_acl_rules" {
 }
 
 variable "public_outbound_acl_rules" {
-  type        = list(map(string))
+  type = list(map(string))
   default = [
     {
       rule_number = 100
@@ -343,4 +292,40 @@ variable "public_outbound_acl_rules" {
     },
   ]
   description = "Public subnets outbound network ACLs"
+}
+
+variable "private_inbound_acl_rules" {
+  type = list(map(string))
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+  description = "Private subnets inbound network ACLs"
+}
+
+variable "private_outbound_acl_rules" {
+  type = list(map(string))
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+  description = "Private subnets outbound network ACLs"
+}
+
+variable "nat_gateway_destination_cidr_block" {
+  type        = string
+  default     = "0.0.0.0/0"
+  description = "Used to pass a custom destination route for private NAT Gateway. If not specified, the default 0.0.0.0/0 is used as a destination route"
 }
