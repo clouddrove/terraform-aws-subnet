@@ -198,7 +198,6 @@ resource "aws_subnet" "private" {
   availability_zone                              = element(var.availability_zones, count.index)
   cidr_block                                     = length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(var.cidr_block, local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)), count.index) : var.ipv4_private_cidrs[count.index]
   ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.private_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 8, local.public_count + count.index + 1) : var.private_ipv6_cidrs[count.index]) : null
-  map_public_ip_on_launch                        = var.map_private_ip_on_launch
   assign_ipv6_address_on_creation                = var.enable_ipv6 && var.private_subnet_ipv6_native ? true : var.private_subnet_assign_ipv6_address_on_creation
   private_dns_hostname_type_on_launch            = var.private_subnet_private_dns_hostname_type_on_launch
   ipv6_native                                    = var.enable_ipv6 && var.private_subnet_ipv6_native

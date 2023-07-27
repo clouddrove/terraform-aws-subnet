@@ -133,14 +133,8 @@ variable "enable_flow_log" {
 
 variable "map_public_ip_on_launch" {
   type        = bool
-  default     = true
+  default     = false
   description = "Specify true to indicate that instances launched into the public subnet should be assigned a public IP address."
-}
-
-variable "map_private_ip_on_launch" {
-  type        = bool
-  default     = true
-  description = "Specify true to indicate that instances launched into the private subnet should be assigned a public IP address."
 }
 
 #Module      : FLOW LOG
@@ -342,7 +336,7 @@ variable "private_inbound_acl_rules" {
   default = [
     {
       rule_number = 100
-      rule_action = "allow"
+      rule_action = "deny"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
@@ -357,7 +351,7 @@ variable "private_outbound_acl_rules" {
   default = [
     {
       rule_number = 100
-      rule_action = "allow"
+      rule_action = "deny"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"

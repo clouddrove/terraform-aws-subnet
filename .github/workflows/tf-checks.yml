@@ -17,7 +17,7 @@ jobs:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './_example/public-private-subnet-single-nat-gateway/'
-  tf-checks-public-private-subnet-example:
+  tf-checks-complete-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './_example/complete/'
