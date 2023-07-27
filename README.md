@@ -53,7 +53,7 @@ We have [*fifty plus terraform modules*][terraform_modules]. A few of them are c
 ## Prerequisites
 
 This module has a few dependencies: 
-- [Terraform 1.4.6](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Terraform 1.5.3](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 
 
