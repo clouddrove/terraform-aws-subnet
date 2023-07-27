@@ -18,7 +18,6 @@ module "vpc" {
   cidr_block                          = "10.0.0.0/16"
   enable_flow_log                     = true # Flow logs will be stored in cloudwatch log group. Variables passed in default.
   create_flow_log_cloudwatch_iam_role = true
-  additional_cidr_block               = ["172.3.0.0/16", "172.2.0.0/16"]
   dhcp_options_domain_name            = "service.consul"
   dhcp_options_domain_name_servers    = ["127.0.0.1", "10.10.0.2"]
   assign_generated_ipv6_cidr_block    = true
@@ -37,7 +36,6 @@ module "subnets" {
   vpc_id             = module.vpc.vpc_id
   type               = "public"
   igw_id             = module.vpc.igw_id
-  cidr_block         = module.vpc.vpc_cidr_block
-  ipv6_cidr_block    = module.vpc.ipv6_cidr_block
-  enable_ipv6        = true
+  ipv4_public_cidrs  = ["10.0.1.0/24", "10.0.13.0/24", "10.0.18.0/24"]
+  enable_ipv6        = false
 }

@@ -135,7 +135,7 @@ resource "aws_route" "public" {
   count                  = local.public_count
   route_table_id         = element(aws_route_table.public.*.id, count.index)
   gateway_id             = var.igw_id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = var.public_rt_ipv4_destination_cidr
   depends_on             = [aws_route_table.public]
   timeouts {
     create = "5m"
@@ -146,7 +146,7 @@ resource "aws_route" "public_ipv6" {
   count                       = local.public_count
   route_table_id              = element(aws_route_table.public.*.id, count.index)
   gateway_id                  = var.igw_id
-  destination_ipv6_cidr_block = "::/0"
+  destination_ipv6_cidr_block = var.public_rt_ipv6_destination_cidr
   depends_on                  = [aws_route_table.public]
 }
 

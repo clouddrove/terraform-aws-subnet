@@ -82,6 +82,7 @@ variable "cidr_block" {
 
 variable "ipv6_cidr_block" {
   type        = string
+  default     = null
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
 }
 
@@ -370,4 +371,16 @@ variable "nat_gateway_destination_cidr_block" {
   type        = string
   default     = "0.0.0.0/0"
   description = "Used to pass a custom destination route for private NAT Gateway. If not specified, the default 0.0.0.0/0 is used as a destination route"
+}
+
+variable "public_rt_ipv4_destination_cidr" {
+  type        = string
+  default     = "0.0.0.0/0"
+  description = "The destination ipv4 CIDR block."
+}
+
+variable "public_rt_ipv6_destination_cidr" {
+  type        = string
+  default     = "::/0"
+  description = "The destination ipv6 CIDR block."
 }
