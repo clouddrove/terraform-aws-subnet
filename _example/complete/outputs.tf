@@ -28,7 +28,7 @@ output "public_tags" {
   description = "A mapping of tags to assign to the resource."
 }
 
-output "vpc_endpoint_id" {
-  value       = module.subnets.vpc_endpoint_id
-  description = "The ID of the vpc endpoint"
+output "public_subnet_id" {
+  value       = module.subnets.private_subnet_id
+  description = "The ID of the public subnet"
 }

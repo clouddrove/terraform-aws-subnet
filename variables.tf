@@ -26,7 +26,7 @@ variable "environment" {
 
 variable "label_order" {
   type        = list(any)
-  default     = []
+  default     = ["name", "environment"]
   description = "Label order, e.g. `name`,`Environment`."
 }
 
@@ -76,8 +76,8 @@ variable "vpc_id" {
 
 variable "cidr_block" {
   type        = string
+  default     = null
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
-
 }
 
 variable "ipv6_cidr_block" {

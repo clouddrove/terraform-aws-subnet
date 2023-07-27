@@ -12,7 +12,7 @@ jobs:
   tf-checks-basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
-      working_directory: './_example/public-private-subnet-endpoint/'
+      working_directory: './_example/basic/'
   tf-checks-public-private-subnet-single-nat-gateway-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
@@ -20,7 +20,7 @@ jobs:
   tf-checks-public-private-subnet-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
-      working_directory: './_example/public-private-subnet/'
+      working_directory: './_example/complete/'
   tf-checks-public-subnet-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
