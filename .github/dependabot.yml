@@ -2,10 +2,8 @@
 # package ecosystems to update and where the package manifests are located.
 # Please see the documentation for all configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
 version: 2
 updates:
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -43,7 +41,7 @@ updates:
     open-pull-requests-limit: 3
 
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/public-private-subnet-endpoint" # Location of package manifests
+    directory: "/_example/complete" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -69,7 +67,7 @@ updates:
     open-pull-requests-limit: 3
 
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/public-private-subnet" # Location of package manifests
+    directory: "/_example/basic" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -93,3 +91,4 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
+

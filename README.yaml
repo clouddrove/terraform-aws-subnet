@@ -5,7 +5,7 @@
 #
 
 # Name of this project
-name: Terraform AWS Subnet
+name : Terraform AWS Subnet
 
 # License of this project
 license: "APACHE"
@@ -25,6 +25,9 @@ badges:
     image: "https://img.shields.io/badge/License-APACHE-blue.svg"
     url: "LICENSE.md"
 
+prerequesties:
+  - name: Terraform 1.4.6
+    url: https://learn.hashicorp.com/terraform/getting-started/install.html
 #  description of this project
 description: |-
   Terraform module to create public, private and public-private subnet with network acl, route table, Elastic IP, nat gateway, flow log.
@@ -40,10 +43,8 @@ usage: |-
   ```hcl
     module "private-subnets" {
       source                = "clouddrove/terraform-aws-subnet/aws"
-      version               = "1.3.0"
       name                  = "subnets"
       environment           = "test"
-      label_order           = ["name", "environment"]
       nat_gateway_enabled   = true
       availability_zones    = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
       vpc_id                = module.vpc.vpc_id
@@ -51,46 +52,24 @@ usage: |-
       cidr_block            = module.vpc.vpc_cidr_block
       ipv6_cidr_block       = module.vpc.ipv6_cidr_block
       public_subnet_ids     = ["subnet-xxxxxxxxxxxx", "subnet-xxxxxxxxxxxx"]
-    }
+  }
   ```
 
   ### PUBLIC-PRIVATE SUBNET
   ```hcl
     module "subnets" {
-      source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "1.3.0"
-      name                = "subnets"
-      environment         = "test"
-      label_order         = ["name", "environment"]
-
-      nat_gateway_enabled             = true
-      availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-      vpc_id                          = module.vpc.vpc_id
-      type                            = "public-private"
-      igw_id                          = module.vpc.igw_id
-      cidr_block                      = module.vpc.vpc_cidr_block
-      ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
-      assign_ipv6_address_on_creation = false
-    }
-  ```
-
-    ### PUBLIC-PRIVATE SUBNET WITH SINGLE NET GATEWAY
-  ```hcl
-    module "subnets" {
-      source              = "clouddrove/terraform-aws-subnet/aws"
-      version             = "1.3.0"
-      name                = "subnets"
-      environment         = "test"
-      label_order         = ["name", "environment"]
-      availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-      nat_gateway_enabled = true
-      single_nat_gateway  = true
-      vpc_id              = module.vpc.vpc_id
-      type                = "public-private"
-      igw_id              = module.vpc.igw_id
-      cidr_block          = module.vpc.vpc_cidr_block
-      ipv6_cidr_block     = module.vpc.ipv6_cidr_block
-      assign_ipv6_address_on_creation = false
+      source                                         = "clouddrove/terraform-aws-subnet/aws"
+      name                                           = "subnets"
+      environment                                    = "test"
+      label_order                                    = ["name", "environment"]
+      nat_gateway_enabled                            = true
+      availability_zones                             = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      vpc_id                                         = module.vpc.vpc_id
+      type                                           = "public-private"
+      igw_id                                         = module.vpc.igw_id
+      cidr_block                                     = module.vpc.vpc_cidr_block
+      ipv6_cidr_block                                = module.vpc.ipv6_cidr_block
+      enable_ipv6                                    = true
     }
   ```
 
@@ -98,39 +77,14 @@ usage: |-
   ```hcl
     module "subnets" {
       source             = "clouddrove/terraform-aws-subnet/aws"
-      version            = "1.3.0"
       name               = "subnets"
       environment        = "test"
       label_order        = ["name", "environment"]
-      availability_zones = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
       vpc_id             = module.vpc.vpc_id
       type               = "public"
       igw_id             = module.vpc.igw_id
-      cidr_block         = module.vpc.vpc_cidr_block
-      ipv6_cidr_block    = module.vpc.ipv6_cidr_block
-      assign_ipv6_address_on_creation = false
-
-    }
-  ```
-
-  ### PUBLIC-PRIVATE-SUBNET-ENDPOINT
-  ```hcl
-    module "subnets" {
-      source             = "clouddrove/terraform-aws-subnet/aws"
-      version            = "1.3.0"
-      name        = "subnets"
-      environment = "prashant"
-      label_order = ["name", "environment"]
-
-      nat_gateway_enabled             = true
-      availability_zones              = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-      vpc_id                          = module.vpc.vpc_id
-      type                            = "public-private"
-      igw_id                          = module.vpc.igw_id
-      cidr_block                      = module.vpc.vpc_cidr_block
-      ipv6_cidr_block                 = module.vpc.ipv6_cidr_block
-      assign_ipv6_address_on_creation = false
-      enable_vpc_endpoint             = true
-      service_name                    = "com.amazonaws.${data.aws_region.current.name}.ec2"
+      ipv4_public_cidrs  = ["10.0.1.0/24", "10.0.13.0/24", "10.0.18.0/24"]
+      enable_ipv6        = false
     }
   ```
