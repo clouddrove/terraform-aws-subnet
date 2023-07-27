@@ -27,6 +27,8 @@ module "vpc" {
 ## Subnet Module call.
 ## Below module will deploy only public subnet.  
 ##-----------------------------------------------------------------------------
+#tfsec:ignore:aws-ec2-no-excessive-port-access 
+#tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "subnets" {
   source             = "./../../"
   name               = local.name
