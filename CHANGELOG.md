@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2023-07-31
+### :sparkles: New Features
+- [`ed62101`](https://github.com/clouddrove/terraform-aws-subnet/commit/ed62101280c6bbfa96b559926070a6c519f3dd44) - updated tfsec.yml file *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`f5c930b`](https://github.com/clouddrove/terraform-aws-subnet/commit/f5c930bd72698b38d4a97e390214a3e458a99a30) - updated changelog.yml name *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`6943d39`](https://github.com/clouddrove/terraform-aws-subnet/commit/6943d3926850e73e9e654c5fd5843805cd6ce1d4) - updated changelog.yml name and file *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`886f047`](https://github.com/clouddrove/terraform-aws-subnet/commit/886f047b6424edf8a6a3272cc2525525c8a28547) - add deepsource & added assignees,reviewer in dependabot *(commit by [@Tanveer143s](https://github.com/Tanveer143s))*
+- [`d4b3fd2`](https://github.com/clouddrove/terraform-aws-subnet/commit/d4b3fd20bcde645b3be80f347733af6ef372c952) - update resource and readme.yaml *(PR [#43](https://github.com/clouddrove/terraform-aws-subnet/pull/43) by [@theprashantyadav](https://github.com/theprashantyadav))*
+- [`1507dff`](https://github.com/clouddrove/terraform-aws-subnet/commit/1507dff94f17909e1db7682b26fadd27f52db646) - added vpc endpoint resource *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`ca930b6`](https://github.com/clouddrove/terraform-aws-subnet/commit/ca930b6dd3784dc9348f42eaf2894374a3f00504) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`4c0a0c4`](https://github.com/clouddrove/terraform-aws-subnet/commit/4c0a0c46afc3c36caa73f51fa9f58a45f8b93ee2) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`0e7ffe2`](https://github.com/clouddrove/terraform-aws-subnet/commit/0e7ffe23bbe449290fb3bf76492caa2e4e27b670) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`00e7638`](https://github.com/clouddrove/terraform-aws-subnet/commit/00e7638282fe3c4ad67c0b2107073ac96ed22894) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`5dabff5`](https://github.com/clouddrove/terraform-aws-subnet/commit/5dabff5a1d8b78083ba6ae5caa02a0aad6435fa5) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`d9ef25a`](https://github.com/clouddrove/terraform-aws-subnet/commit/d9ef25ae379ab57b4924b7ea07341c414c47311d) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`9fe72e8`](https://github.com/clouddrove/terraform-aws-subnet/commit/9fe72e86806c1bad2e7bf5a7271b148592277c3c) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`b824573`](https://github.com/clouddrove/terraform-aws-subnet/commit/b82457373507077e42bde6ef3951d5038930859a) - enabled vpc endpoint *(commit by [@vibhutigoyal](https://github.com/vibhutigoyal))*
+- [`ae8e7aa`](https://github.com/clouddrove/terraform-aws-subnet/commit/ae8e7aace667ec5eb808e5ef4482efe151db6fe7) - added github action files and endpoint policy *(commit by [@anmolnagpal](https://github.com/anmolnagpal))*
+- [`fc053bf`](https://github.com/clouddrove/terraform-aws-subnet/commit/fc053bfbbb136d0d13f91ba220983d6abc772f28) - added github action files and endpoint policy *(commit by [@anmolnagpal](https://github.com/anmolnagpal))*
+
+### :bug: Bug Fixes
+- [`bb20e60`](https://github.com/clouddrove/terraform-aws-subnet/commit/bb20e6059326f5ae1b7b9cc112fc7d71096ce1a5) - Fixed Readme.yaml & Versions.tf *(PR [#50](https://github.com/clouddrove/terraform-aws-subnet/pull/50) by [@13archit](https://github.com/13archit))*
+
+
 ## [v1.3.0] - 2022-12-30
 ### :bug: Bug Fixes
 - [`f57c04e`](https://github.com/clouddrove/terraform-aws-subnet/commit/f57c04eeea83e0b99c58db9c9f59cda34a74f729) - update workflows.
@@ -146,3 +169,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.15.3]: https://github.com/clouddrove/terraform-aws-subnet/compare/v0.15.2...v0.15.3
 [v1.0.1]: https://github.com/clouddrove/terraform-aws-subnet/compare/v0.15.3...v1.0.1
 [v1.3.0]: https://github.com/clouddrove/terraform-aws-subnet/compare/v1.0.1...v1.3.0
+[2.0.0]: https://github.com/clouddrove/terraform-aws-subnet/compare/1.3.0...2.0.0
