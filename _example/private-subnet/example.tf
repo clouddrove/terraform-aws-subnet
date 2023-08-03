@@ -40,5 +40,5 @@ module "private-subnets" {
   type                = "private"
   cidr_block          = module.vpc.vpc_cidr_block
   ipv6_cidr_block     = module.vpc.ipv6_cidr_block
-  public_subnet_ids   = ["subnet-xxxxxxxxxxxx", "subnet-xxxxxxxxxxxx"]
+  public_subnet_ids   = ["subnet-xxxxxxx", "subnet-xxxxxxx"]
 }
