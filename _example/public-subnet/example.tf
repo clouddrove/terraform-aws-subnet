@@ -33,7 +33,6 @@ module "subnets" {
   source             = "./../../"
   name               = local.name
   environment        = local.environment
-  label_order        = ["name", "environment"]
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
   vpc_id             = module.vpc.vpc_id
   type               = "public"
