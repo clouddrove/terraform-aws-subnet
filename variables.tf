@@ -42,10 +42,16 @@ variable "delimiter" {
   description = "Delimiter to be used between `organization`, `environment`, `name` and `attributes`."
 }
 
-variable "tags" {
+variable "extra_public_tags" {
   type        = map(any)
   default     = {}
-  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
+  description = "Additional public subnet tags."
+}
+
+variable "extra_private_tags" {
+  type        = map(any)
+  default     = {}
+  description = "Additional private subnet tags."
 }
 
 variable "managedby" {
