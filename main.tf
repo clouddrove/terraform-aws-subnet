@@ -59,7 +59,7 @@ resource "aws_subnet" "public" {
   enable_resource_name_dns_a_record_on_launch    = !var.public_subnet_ipv6_native && var.public_subnet_enable_resource_name_dns_a_record_on_launch
   enable_dns64                                   = var.enable_ipv6 && var.public_subnet_enable_dns64
   tags = merge(
-    module.public-labels.tags, var.tags,
+    module.public-labels.tags, var.extra_public_tags,
     {
       "Name" = format("%s%s%s", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
@@ -81,7 +81,7 @@ resource "aws_subnet" "public" {
 resource "aws_network_acl" "public" {
   count      = var.enable && local.public_count > 0 && var.enable_public_acl && (var.type == "public" || var.type == "public-private") ? 1 : 0
   vpc_id     = var.vpc_id
-  subnet_ids = aws_subnet.public.*.id
+  subnet_ids = aws_subnet.public[*].id
   tags       = module.public-labels.tags
   depends_on = [aws_subnet.public]
 }
@@ -133,7 +133,7 @@ resource "aws_route_table" "public" {
 
 resource "aws_route" "public" {
   count                  = local.public_count
-  route_table_id         = element(aws_route_table.public.*.id, count.index)
+  route_table_id         = element(aws_route_table.public[*].id, count.index)
   gateway_id             = var.igw_id
   destination_cidr_block = var.public_rt_ipv4_destination_cidr
   depends_on             = [aws_route_table.public]
@@ -144,7 +144,7 @@ resource "aws_route" "public" {
 
 resource "aws_route" "public_ipv6" {
   count                       = local.public_count
-  route_table_id              = element(aws_route_table.public.*.id, count.index)
+  route_table_id              = element(aws_route_table.public[*].id, count.index)
   gateway_id                  = var.igw_id
   destination_ipv6_cidr_block = var.public_rt_ipv6_destination_cidr
   depends_on                  = [aws_route_table.public]
@@ -152,8 +152,8 @@ resource "aws_route" "public_ipv6" {
 
 resource "aws_route_table_association" "public" {
   count          = local.public_count
-  subnet_id      = element(aws_subnet.public.*.id, count.index)
-  route_table_id = element(aws_route_table.public.*.id, count.index)
+  subnet_id      = element(aws_subnet.public[*].id, count.index)
+  route_table_id = element(aws_route_table.public[*].id, count.index)
   depends_on = [
     aws_subnet.public,
     aws_route_table.public,
@@ -170,7 +170,7 @@ resource "aws_flow_log" "public_subnet_flow_log" {
   log_format               = var.flow_log_log_format
   iam_role_arn             = var.flow_log_iam_role_arn
   traffic_type             = var.flow_log_traffic_type
-  subnet_id                = element(aws_subnet.public.*.id, count.index)
+  subnet_id                = element(aws_subnet.public[*].id, count.index)
   max_aggregation_interval = var.flow_log_max_aggregation_interval
   dynamic "destination_options" {
     for_each = var.flow_log_destination_type == "s3" ? [true] : []
@@ -206,12 +206,11 @@ resource "aws_subnet" "private" {
   enable_dns64                                   = var.enable_ipv6 && var.private_subnet_enable_dns64
 
   tags = merge(
-    module.private-labels.tags,
+    module.private-labels.tags, var.extra_private_tags,
     {
       "Name" = format("%s%s%s", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
-    },
-    var.tags
+    }
   )
 
   lifecycle {
@@ -230,7 +229,7 @@ resource "aws_subnet" "private" {
 resource "aws_network_acl" "private" {
   count      = var.enable && var.enable_private_acl && (var.type == "private" || var.type == "public-private") ? 1 : 0
   vpc_id     = var.vpc_id
-  subnet_ids = aws_subnet.private.*.id
+  subnet_ids = aws_subnet.private[*].id
   tags       = module.private-labels.tags
   depends_on = [aws_subnet.private]
 }
@@ -282,15 +281,15 @@ resource "aws_route_table" "private" {
 
 resource "aws_route_table_association" "private" {
   count          = local.private_count
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
-  route_table_id = element(aws_route_table.private.*.id, var.single_nat_gateway ? 0 : count.index, )
+  subnet_id      = element(aws_subnet.private[*].id, count.index)
+  route_table_id = element(aws_route_table.private[*].id, var.single_nat_gateway ? 0 : count.index, )
 }
 
 resource "aws_route" "nat_gateway" {
   count                  = local.nat_gateway_count > 0 ? local.nat_gateway_count : 0
-  route_table_id         = element(aws_route_table.private.*.id, count.index)
+  route_table_id         = element(aws_route_table.private[*].id, count.index)
   destination_cidr_block = var.nat_gateway_destination_cidr_block
-  nat_gateway_id         = element(aws_nat_gateway.private.*.id, count.index)
+  nat_gateway_id         = element(aws_nat_gateway.private[*].id, count.index)
   depends_on             = [aws_route_table.private]
 }
 
@@ -316,8 +315,8 @@ resource "aws_eip" "private" {
 ##----------------------------------------------------------------------------------
 resource "aws_nat_gateway" "private" {
   count         = local.nat_gateway_count
-  allocation_id = element(aws_eip.private.*.id, count.index)
-  subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public.*.id, count.index) : element(var.public_subnet_ids, count.index)
+  allocation_id = element(aws_eip.private[*].id, count.index)
+  subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public[*].id, count.index) : element(var.public_subnet_ids, count.index)
   tags = merge(
     module.private-labels.tags,
     {
@@ -336,7 +335,7 @@ resource "aws_flow_log" "private_subnet_flow_log" {
   log_format               = var.flow_log_log_format
   iam_role_arn             = var.flow_log_iam_role_arn
   traffic_type             = var.flow_log_traffic_type
-  subnet_id                = element(aws_subnet.private.*.id, count.index)
+  subnet_id                = element(aws_subnet.private[*].id, count.index)
   max_aggregation_interval = var.flow_log_max_aggregation_interval
   dynamic "destination_options" {
     for_each = var.flow_log_destination_type == "s3" ? [true] : []
