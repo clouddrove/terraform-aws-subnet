@@ -60,3 +60,8 @@ output "private_acl" {
   value       = join("", aws_network_acl.private[*].id)
   description = "The ID of the network ACL."
 }
+
+output "nat_gateway_private_ip" {
+  value       = aws_nat_gateway.private[*].private_ip
+  description = "The private IPv4 address to assign to the NAT Gateway. If you don't provide an address, a private IPv4 address will be automatically assigned."
+}

@@ -32,3 +32,8 @@ output "public_subnet_id" {
   value       = module.subnets.private_subnet_id
   description = "The ID of the public subnet"
 }
+
+output "nat_gateway_private_ip" {
+  value       = module.subnets.nat_gateway_private_ip
+  description = "The private IPv4 address to assign to the NAT Gateway. If you don't provide an address, a private IPv4 address will be automatically assigned."
+}
