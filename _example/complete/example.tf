@@ -1,20 +1,24 @@
 provider "aws" {
-  region = "eu-west-1"
+  region = local.region
 }
 
 locals {
   name        = "app"
   environment = "test"
+  region      = "eu-west-1"
 }
 
 ##----------------------------------------------------------------------------- 
 ## Vpc Module call.    
 ##-----------------------------------------------------------------------------
 module "vpc" {
-  source                              = "clouddrove/vpc/aws"
-  version                             = "2.0.0"
-  name                                = local.name
-  environment                         = local.environment
+  source  = "clouddrove/vpc/aws"
+  version = "2.0.0"
+
+  enable      = true
+  name        = local.name
+  environment = local.environment
+
   cidr_block                          = "10.0.0.0/16"
   enable_flow_log                     = true # Flow logs will be stored in cloudwatch log group. Variables passed in default.
   create_flow_log_cloudwatch_iam_role = true
@@ -31,11 +35,15 @@ module "vpc" {
 #tfsec:ignore:aws-ec2-no-excessive-port-access 
 #tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "subnets" {
-  source                                         = "./../../"
-  name                                           = local.name
-  environment                                    = local.environment
+  source = "./../../"
+
+  enable      = true
+  name        = local.name
+  environment = local.environment
+
   nat_gateway_enabled                            = true
-  availability_zones                             = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  single_nat_gateway                             = true
+  availability_zones                             = ["${local.region}a", "${local.region}b", "${local.region}c"]
   vpc_id                                         = module.vpc.vpc_id
   type                                           = "public-private"
   igw_id                                         = module.vpc.igw_id
