@@ -7,7 +7,7 @@
 locals {
   public_count      = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_count     = var.enable == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
-  nat_gateway_count = var.single_nat_gateway ? 1 : (var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0)
+  nat_gateway_count = var.enable == true && var.single_nat_gateway ? 1 : (var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0)
 }
 ##----------------------------------------------------------------------------- 
 ## Labels module called that will be used for naming and tags.   
