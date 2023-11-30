@@ -68,7 +68,6 @@ resource "aws_subnet" "public" {
   lifecycle {
     # Ignore tags added by kubernetes
     ignore_changes = [
-      tags,
       tags["kubernetes.io"],
       tags["SubnetType"],
     ]
@@ -216,7 +215,6 @@ resource "aws_subnet" "private" {
   lifecycle {
     # Ignore tags added by kubernetes
     ignore_changes = [
-      tags,
       tags["kubernetes.io"],
       tags["SubnetType"],
     ]
