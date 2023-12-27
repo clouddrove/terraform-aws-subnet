@@ -4,10 +4,9 @@ on:
   pull_request:
 jobs:
   auto-merge:
-    uses: clouddrove/github-shared-workflows/.github/workflows/automerge.yml@auto_merge.yml@1.0.9
+    uses: clouddrove/github-shared-workflows/.github/workflows@auto_merge.yml@1.0.9
     secrets:
       GITHUB: ${{ secrets.GITHUB }}
-      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
     with:
       tfcheck: 'tf-checks-public-subnet-example / Get min/max versions'
 ...
