@@ -52,4 +52,24 @@ module "subnets" {
   public_subnet_assign_ipv6_address_on_creation  = true
   enable_ipv6                                    = true
   private_subnet_assign_ipv6_address_on_creation = true
+  private_inbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = module.vpc.vpc_cidr_block
+    }
+  ]
+  private_outbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = module.vpc.vpc_cidr_block
+    }
+  ]
 }
