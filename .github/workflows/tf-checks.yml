@@ -6,22 +6,22 @@ on:
   workflow_dispatch:
 jobs:
   tf-checks-private-subnet-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.1
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/private-subnet/'
+      working_directory: './examples/private-subnet/'
   tf-checks-basic-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.1
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/basic/'
+      working_directory: './examples/basic/'
   tf-checks-public-private-subnet-single-nat-gateway-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.1
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/public-private-subnet-single-nat-gateway/'
+      working_directory: './examples/public-private-subnet-single-nat-gateway/'
   tf-checks-complete-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.1
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/complete/'
+      working_directory: './examples/complete/'
   tf-checks-public-subnet-example:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.1
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/public-subnet/'
+      working_directory: './examples/public-subnet/'
