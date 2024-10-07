@@ -8,8 +8,8 @@ locals {
   region      = "eu-west-1"
 }
 
-##----------------------------------------------------------------------------- 
-## Vpc Module call.    
+##-----------------------------------------------------------------------------
+## Vpc Module call.
 ##-----------------------------------------------------------------------------
 module "vpc" {
   source  = "clouddrove/vpc/aws"
@@ -28,11 +28,11 @@ module "vpc" {
   assign_generated_ipv6_cidr_block    = true
 }
 
-##----------------------------------------------------------------------------- 
-## Subnet Module call.
-## Below module will deploy both public and private subnets.  
 ##-----------------------------------------------------------------------------
-#tfsec:ignore:aws-ec2-no-excessive-port-access 
+## Subnet Module call.
+## Below module will deploy both public and private subnets.
+##-----------------------------------------------------------------------------
+#tfsec:ignore:aws-ec2-no-excessive-port-access
 #tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "subnets" {
   source = "./../../"

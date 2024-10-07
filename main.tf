@@ -1,16 +1,16 @@
-# Managed By : CloudDrove 
+# Managed By : CloudDrove
 # Copyright @ CloudDrove. All Right Reserved.
 
-##----------------------------------------------------------------------------- 
-## Locals declration to determine count of public subnet, private subnet, and nat gateway. 
+##-----------------------------------------------------------------------------
+## Locals declration to determine count of public subnet, private subnet, and nat gateway.
 ##-----------------------------------------------------------------------------
 locals {
   public_count      = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_count     = var.enable == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
   nat_gateway_count = var.enable == true && var.single_nat_gateway ? 1 : (var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0)
 }
-##----------------------------------------------------------------------------- 
-## Labels module called that will be used for naming and tags.   
+##-----------------------------------------------------------------------------
+## Labels module called that will be used for naming and tags.
 ##-----------------------------------------------------------------------------
 module "private-labels" {
   source  = "clouddrove/labels/aws"
@@ -42,8 +42,8 @@ module "public-labels" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will deploy public subnets and its related components in aws environment.     
+##-----------------------------------------------------------------------------
+## Below resource will deploy public subnets and its related components in aws environment.
 ##-----------------------------------------------------------------------------
 resource "aws_subnet" "public" {
   count                                          = local.public_count
@@ -74,8 +74,8 @@ resource "aws_subnet" "public" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will deploy network acl and its rules that will be attached to public subnets.     
+##-----------------------------------------------------------------------------
+## Below resource will deploy network acl and its rules that will be attached to public subnets.
 ##-----------------------------------------------------------------------------
 resource "aws_network_acl" "public" {
   count      = var.enable && local.public_count > 0 && var.enable_public_acl && (var.type == "public" || var.type == "public-private") ? 1 : 0
@@ -115,8 +115,8 @@ resource "aws_network_acl_rule" "public_outbound" {
   ipv6_cidr_block = lookup(var.public_outbound_acl_rules[count.index], "ipv6_cidr_block", null)
 }
 
-##----------------------------------------------------------------------------- 
-## Below resources will deploy route table and routes for public subnet and will be associated to public subnets.     
+##-----------------------------------------------------------------------------
+## Below resources will deploy route table and routes for public subnet and will be associated to public subnets.
 ##-----------------------------------------------------------------------------
 resource "aws_route_table" "public" {
   count  = local.public_count
@@ -159,8 +159,8 @@ resource "aws_route_table_association" "public" {
   ]
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will deploy flow logs for public subnet. 
+##-----------------------------------------------------------------------------
+## Below resource will deploy flow logs for public subnet.
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "public_subnet_flow_log" {
   count                    = var.enable && var.enable_flow_log && local.public_count > 0 ? 1 : 0
@@ -188,8 +188,8 @@ resource "aws_flow_log" "public_subnet_flow_log" {
   )
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will deploy private subnets and its related components in aws environment.     
+##-----------------------------------------------------------------------------
+## Below resource will deploy private subnets and its related components in aws environment.
 ##-----------------------------------------------------------------------------
 resource "aws_subnet" "private" {
   count                                          = local.private_count
@@ -221,8 +221,8 @@ resource "aws_subnet" "private" {
   }
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will deploy network acl and its rules that will be attached to private subnets.     
+##-----------------------------------------------------------------------------
+## Below resource will deploy network acl and its rules that will be attached to private subnets.
 ##-----------------------------------------------------------------------------
 resource "aws_network_acl" "private" {
   count      = var.enable && var.enable_private_acl && (var.type == "private" || var.type == "public-private") ? 1 : 0
@@ -262,8 +262,8 @@ resource "aws_network_acl_rule" "private_outbound" {
   ipv6_cidr_block = lookup(var.private_outbound_acl_rules[count.index], "ipv6_cidr_block", null)
 }
 
-##----------------------------------------------------------------------------- 
-## Below resources will deploy route table and routes for private subnet and will be associated to private subnets.     
+##-----------------------------------------------------------------------------
+## Below resources will deploy route table and routes for private subnet and will be associated to private subnets.
 ##-----------------------------------------------------------------------------
 resource "aws_route_table" "private" {
   count  = local.private_count
@@ -292,7 +292,7 @@ resource "aws_route" "nat_gateway" {
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will create Elastic IP (EIP) for nat gateway. 
+## Below resource will create Elastic IP (EIP) for nat gateway.
 ##----------------------------------------------------------------------------------
 resource "aws_eip" "private" {
   count  = local.nat_gateway_count
@@ -309,7 +309,7 @@ resource "aws_eip" "private" {
 }
 
 ##----------------------------------------------------------------------------------
-## Below resource will deploy nat gateway for private subnets. 
+## Below resource will deploy nat gateway for private subnets.
 ##----------------------------------------------------------------------------------
 resource "aws_nat_gateway" "private" {
   count         = local.nat_gateway_count
@@ -323,8 +323,8 @@ resource "aws_nat_gateway" "private" {
   )
 }
 
-##----------------------------------------------------------------------------- 
-## Below resource will deploy flow logs for private subnet. 
+##-----------------------------------------------------------------------------
+## Below resource will deploy flow logs for private subnet.
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "private_subnet_flow_log" {
   count                    = var.enable && var.enable_flow_log && local.private_count > 0 ? 1 : 0

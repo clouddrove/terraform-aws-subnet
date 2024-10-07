@@ -76,4 +76,3 @@
 | public\_subnet\_cidrs\_ipv6 | CIDR blocks of the created public subnets. |
 | public\_subnet\_id | The ID of the subnet. |
 | public\_tags | A mapping of public tags to assign to the resource. |
-
