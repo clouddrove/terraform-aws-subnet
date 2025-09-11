@@ -9,7 +9,7 @@ jobs:
   terraform:
     uses: clouddrove/github-shared-workflows/.github/workflows/terraform_workflow.yml@master
     with:
-      working_directory: example/complete
+      working_directory: examples/complete
       provider: aws
       aws_region: eu-west-1
       terraform_version: 1.12.2
