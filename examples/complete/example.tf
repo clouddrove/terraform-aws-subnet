@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 locals {
-  name        = "app"
+  name        = "r-app"
   environment = "test"
   region      = "eu-west-1"
 }
