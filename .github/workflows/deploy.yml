@@ -1,0 +1,23 @@
+name: "🚀 AWS Terraform Deploy"
+
+on:
+  push:
+    branches:
+      - check-github-workflow
+
+jobs:
+  terraform:
+    uses: clouddrove/github-shared-workflows/.github/workflows/terraform_workflow.yml@master
+    with:
+      working_directory: example/complete
+      provider: aws
+      aws_region: eu-west-1
+      terraform_version: 1.12.2
+      target_environment: test
+      destroy: true
+      approvers: "ruchit-sharma09"
+      minimum-approvals: 1
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
