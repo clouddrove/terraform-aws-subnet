@@ -14,7 +14,7 @@ jobs:
       aws_region: eu-west-1
       terraform_version: 1.12.2
       target_environment: test
-      destroy: true
+      destroy: false
       approvers: "ruchit-sharma09"
       minimum-approvals: 1
     secrets:
