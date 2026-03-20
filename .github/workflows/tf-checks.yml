@@ -9,19 +9,24 @@ jobs:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/private-subnet/'
+      provider: none
   tf-checks-basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/basic/'
+      provider: none
   tf-checks-public-private-subnet-single-nat-gateway-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/public-private-subnet-single-nat-gateway/'
+      provider: none
   tf-checks-complete-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/complete/'
+      provider: none
   tf-checks-public-subnet-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/public-subnet/'
+      provider: none
