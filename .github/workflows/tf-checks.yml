@@ -10,6 +10,7 @@ jobs:
     with:
       working_directory: './examples/private-subnet/'
       provider: aws
+      enable_plan: true
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   tf-checks-basic-example:
@@ -18,6 +19,7 @@ jobs:
     with:
       working_directory: './examples/basic/'
       provider: aws
+      enable_plan: true
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   tf-checks-public-private-subnet-single-nat-gateway-example:
@@ -26,6 +28,7 @@ jobs:
     with:
       working_directory: './examples/public-private-subnet-single-nat-gateway/'
       provider: aws
+      enable_plan: true
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   tf-checks-complete-example:
@@ -34,6 +37,7 @@ jobs:
     with:
       working_directory: './examples/complete/'
       provider: aws
+      enable_plan: true
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   tf-checks-public-subnet-example:
@@ -42,5 +46,6 @@ jobs:
     with:
       working_directory: './examples/public-subnet/'
       provider: aws
+      enable_plan: true
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
