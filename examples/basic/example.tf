@@ -3,11 +3,11 @@ locals {
   environment = "test"
 }
 
-##----------------------------------------------------------------------------- 
-## Subnet Module Call. 
-## Both private and public subnet will be deployed.     
 ##-----------------------------------------------------------------------------
-#tfsec:ignore:aws-ec2-no-excessive-port-access 
+## Subnet Module Call.
+## Both private and public subnet will be deployed.
+##-----------------------------------------------------------------------------
+#tfsec:ignore:aws-ec2-no-excessive-port-access
 #tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "subnets" {
   source              = "./../../"
