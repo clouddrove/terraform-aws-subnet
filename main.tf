@@ -145,7 +145,7 @@ resource "aws_route" "public" {
 }
 
 resource "aws_route" "public_ipv6" {
-  count                       = local.public_count
+  count                       = var.enable_ipv6 ? local.public_count : 0
   route_table_id              = element(aws_route_table.public[*].id, count.index)
   gateway_id                  = var.igw_id
   destination_ipv6_cidr_block = var.public_rt_ipv6_destination_cidr
@@ -166,17 +166,16 @@ resource "aws_route_table_association" "public" {
 ## Below resource will deploy flow logs for public subnet.
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "public_subnet_flow_log" {
-  count                    = var.enable && var.enable_flow_log && local.public_count > 0 ? 1 : 0
+  count                    = var.enable && var.enable_flow_log ? local.public_count : 0
   log_destination_type     = var.flow_log_destination_type
   log_destination          = var.flow_log_destination_arn
   log_format               = var.flow_log_log_format
   iam_role_arn             = var.flow_log_iam_role_arn
   traffic_type             = var.flow_log_traffic_type
-  subnet_id                = element(aws_subnet.public[*].id, count.index)
+  subnet_id                = aws_subnet.public[count.index].id
   max_aggregation_interval = var.flow_log_max_aggregation_interval
   dynamic "destination_options" {
     for_each = var.flow_log_destination_type == "s3" ? [true] : []
-
     content {
       file_format                = var.flow_log_file_format
       hive_compatible_partitions = var.flow_log_hive_compatible_partitions
@@ -185,9 +184,7 @@ resource "aws_flow_log" "public_subnet_flow_log" {
   }
   tags = merge(
     module.public-labels.tags,
-    {
-      "Name" = format("%s-flowlog", module.public-labels.name)
-    }
+    { "Name" = format("%s-%s-flowlog", module.public-labels.name, element(var.availability_zones, count.index)) }
   )
 }
 
@@ -298,7 +295,8 @@ resource "aws_route" "nat_gateway" {
 ## Below resource will create Elastic IP (EIP) for nat gateway.
 ##----------------------------------------------------------------------------------
 resource "aws_eip" "private" {
-  count  = local.nat_gateway_count
+  # Only public NAT gateways need an EIP
+  count  = var.nat_gateway_connectivity_type == "public" ? local.nat_gateway_count : 0
   domain = "vpc"
   tags = merge(
     module.private-labels.tags,
@@ -315,32 +313,34 @@ resource "aws_eip" "private" {
 ## Below resource will deploy nat gateway for private subnets.
 ##----------------------------------------------------------------------------------
 resource "aws_nat_gateway" "private" {
-  count         = local.nat_gateway_count
-  allocation_id = element(aws_eip.private[*].id, count.index)
-  subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public[*].id, count.index) : element(var.public_subnet_ids, count.index)
+  count             = local.nat_gateway_count
+  connectivity_type = var.nat_gateway_connectivity_type
+  allocation_id     = var.nat_gateway_connectivity_type == "public" ? element(aws_eip.private[*].id, count.index) : null
+  subnet_id         = length(aws_subnet.public) > 0 ? element(aws_subnet.public[*].id, count.index) : element(var.public_subnet_ids, count.index)
   tags = merge(
     module.private-labels.tags,
     {
       "Name" = format("%s%s%s-nat-gateway", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
     }
   )
+  # Ensures the IGW route (and therefore IGW itself) exists before NAT gateways are created
+  depends_on = [aws_route.public]
 }
 
 ##-----------------------------------------------------------------------------
 ## Below resource will deploy flow logs for private subnet.
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "private_subnet_flow_log" {
-  count                    = var.enable && var.enable_flow_log && local.private_count > 0 ? 1 : 0
+  count                    = var.enable && var.enable_flow_log ? local.private_count : 0
   log_destination_type     = var.flow_log_destination_type
   log_destination          = var.flow_log_destination_arn
   log_format               = var.flow_log_log_format
   iam_role_arn             = var.flow_log_iam_role_arn
   traffic_type             = var.flow_log_traffic_type
-  subnet_id                = element(aws_subnet.private[*].id, count.index)
+  subnet_id                = aws_subnet.private[count.index].id
   max_aggregation_interval = var.flow_log_max_aggregation_interval
   dynamic "destination_options" {
     for_each = var.flow_log_destination_type == "s3" ? [true] : []
-
     content {
       file_format                = var.flow_log_file_format
       hive_compatible_partitions = var.flow_log_hive_compatible_partitions
@@ -349,8 +349,6 @@ resource "aws_flow_log" "private_subnet_flow_log" {
   }
   tags = merge(
     module.private-labels.tags,
-    {
-      "Name" = format("%s-flowlog", module.private-labels.name)
-    }
+    { "Name" = format("%s-%s-flowlog", module.private-labels.name, element(var.availability_zones, count.index)) }
   )
 }
