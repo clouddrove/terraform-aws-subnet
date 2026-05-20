@@ -8,6 +8,9 @@ locals {
   public_count      = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_count     = var.enable == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
   nat_gateway_count = var.enable == true && var.single_nat_gateway ? 1 : (var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0)
+  # When single_nat_gateway=true, only 1 route table is needed — all private subnets
+  # associate with index 0. Creating one per AZ produces orphaned tables with no routes.
+  private_rt_count = local.private_count > 0 && var.single_nat_gateway ? 1 : local.private_count
 }
 ##-----------------------------------------------------------------------------
 ## Labels module called that will be used for naming and tags.
@@ -248,7 +251,7 @@ resource "aws_network_acl_rule" "private_inbound" {
 }
 
 resource "aws_network_acl_rule" "private_outbound" {
-  count           = var.enable && var.enable_private_acl && (var.type == "private" || var.type == "public-private") ? length(var.private_inbound_acl_rules) : 0
+  count           = var.enable && var.enable_private_acl && (var.type == "private" || var.type == "public-private") ? length(var.private_outbound_acl_rules) : 0
   network_acl_id  = aws_network_acl.private[0].id
   egress          = true
   rule_number     = var.private_outbound_acl_rules[count.index]["rule_number"]
@@ -266,7 +269,7 @@ resource "aws_network_acl_rule" "private_outbound" {
 ## Below resources will deploy route table and routes for private subnet and will be associated to private subnets.
 ##-----------------------------------------------------------------------------
 resource "aws_route_table" "private" {
-  count  = local.private_count
+  count  = local.private_rt_count
   vpc_id = var.vpc_id
   tags = merge(
     module.private-labels.tags,
@@ -280,7 +283,7 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   count          = local.private_count
   subnet_id      = element(aws_subnet.private[*].id, count.index)
-  route_table_id = element(aws_route_table.private[*].id, var.single_nat_gateway ? 0 : count.index, )
+  route_table_id = element(aws_route_table.private[*].id, var.single_nat_gateway ? 0 : count.index)
 }
 
 resource "aws_route" "nat_gateway" {
