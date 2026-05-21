@@ -384,3 +384,83 @@ variable "public_rt_ipv6_destination_cidr" {
   default     = "::/0"
   description = "The destination ipv6 CIDR block."
 }
+
+variable "additional_public_routes_for_all" {
+  description = <<-EOT
+    Routes added to EVERY public route table (all AZs get the same routes).
+    Use this when you want uniform routing across all AZs.
+
+    Example:
+      additional_public_routes_for_all = [
+        {
+          destination_cidr_block = "10.100.0.0/16"
+          gateway_id             = aws_vpn_gateway.this.id
+        }
+      ]
+  EOT
+  type        = list(map(string))
+  default     = []
+}
+
+variable "additional_public_routes_per_subnet" {
+  description = <<-EOT
+    Routes added to specific AZ public route tables only.
+    Key = AZ name, Value = list of routes for that AZ.
+    AZs not listed here get no additional per-subnet routes.
+
+    Example:
+      additional_public_routes_per_subnet = {
+        "eu-west-1a" = [
+          {
+            destination_cidr_block = "192.168.1.0/24"
+            gateway_id             = aws_vpn_gateway.this.id
+          }
+        ]
+        "eu-west-1b" = [
+          {
+            destination_cidr_block = "192.168.2.0/24"
+            transit_gateway_id     = aws_ec2_transit_gateway.this.id
+          }
+        ]
+      }
+  EOT
+  type        = map(list(map(string)))
+  default     = {}
+}
+
+variable "additional_private_routes_for_all" {
+  description = <<-EOT
+    Routes added to EVERY private route table (all AZs get the same routes).
+    Use this when you want uniform routing across all AZs.
+
+    Example:
+      additional_private_routes_for_all = [
+        {
+          destination_cidr_block = "10.100.0.0/16"
+          gateway_id             = aws_vpn_gateway.this.id
+        }
+      ]
+  EOT
+  type        = list(map(string))
+  default     = []
+}
+
+variable "additional_private_routes_per_subnet" {
+  description = <<-EOT
+    Routes added to specific AZ private route tables only.
+    Key = AZ name, Value = list of routes for that AZ.
+    AZs not listed here get no additional per-subnet routes.
+
+    Example:
+      additional_private_routes_per_subnet = {
+        "eu-west-1a" = [
+          {
+            destination_cidr_block = "192.168.1.0/24"
+            gateway_id             = aws_vpn_gateway.this.id
+          }
+        ]
+      }
+  EOT
+  type        = map(list(map(string)))
+  default     = {}
+}
