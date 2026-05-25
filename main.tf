@@ -11,6 +11,40 @@ locals {
   # When single_nat_gateway=true, only 1 route table is needed — all private subnets
   # associate with index 0. Creating one per AZ produces orphaned tables with no routes.
   private_rt_count = local.private_count > 0 && var.single_nat_gateway ? 1 : local.private_count
+
+  public_additional_routes_expanded = var.enable ? flatten([
+    for az_index, az in var.availability_zones : concat(
+      [
+        for route in var.additional_public_routes_for_all : merge(route, {
+          az_index = tostring(az_index)
+          az_name  = az
+        })
+      ],
+      [
+        for route in lookup(var.additional_public_routes_per_subnet, az, []) : merge(route, {
+          az_index = tostring(az_index)
+          az_name  = az
+        })
+      ]
+    )
+  ]) : []
+
+  private_additional_routes_expanded = var.enable ? flatten([
+    for az_index, az in var.availability_zones : concat(
+      [
+        for route in var.additional_private_routes_for_all : merge(route, {
+          az_index = tostring(az_index)
+          az_name  = az
+        })
+      ],
+      [
+        for route in lookup(var.additional_private_routes_per_subnet, az, []) : merge(route, {
+          az_index = tostring(az_index)
+          az_name  = az
+        })
+      ]
+    )
+  ]) : []
 }
 ##-----------------------------------------------------------------------------
 ## Labels module called that will be used for naming and tags.
@@ -351,4 +385,67 @@ resource "aws_flow_log" "private_subnet_flow_log" {
     module.private-labels.tags,
     { "Name" = format("%s-%s-flowlog", module.private-labels.name, element(var.availability_zones, count.index)) }
   )
+}
+
+##-----------------------------------------------------------------------------
+## Below resources will deploy additional routes for public route tables.
+## Controlled by var.enable — when false, no routes are created.
+## Routes are only created when caller explicitly passes values.
+##-----------------------------------------------------------------------------
+resource "aws_route" "public_additional" {
+  for_each = var.enable ? {
+    for r in local.public_additional_routes_expanded :
+    "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
+  } : {}
+  route_table_id              = aws_route_table.public[tonumber(each.value.az_index)].id
+  destination_cidr_block      = lookup(each.value, "destination_cidr_block", null)
+  destination_ipv6_cidr_block = lookup(each.value, "destination_ipv6_cidr_block", null)
+
+  gateway_id                = lookup(each.value, "gateway_id", null)
+  nat_gateway_id            = lookup(each.value, "nat_gateway_id", null)
+  transit_gateway_id        = lookup(each.value, "transit_gateway_id", null)
+  vpc_peering_connection_id = lookup(each.value, "vpc_peering_connection_id", null)
+  network_interface_id      = lookup(each.value, "network_interface_id", null)
+  egress_only_gateway_id    = lookup(each.value, "egress_only_gateway_id", null)
+  carrier_gateway_id        = lookup(each.value, "carrier_gateway_id", null)
+  local_gateway_id          = lookup(each.value, "local_gateway_id", null)
+  core_network_arn          = lookup(each.value, "core_network_arn", null)
+
+  depends_on = [aws_route_table.public]
+
+  timeouts {
+    create = "5m"
+  }
+}
+
+##-----------------------------------------------------------------------------
+## Below resources will deploy additional routes for private route tables.
+## Controlled by var.enable — when false, no routes are created.
+## Routes are only created when caller explicitly passes values.
+##-----------------------------------------------------------------------------
+resource "aws_route" "private_additional" {
+  for_each = var.enable ? {
+    for r in local.private_additional_routes_expanded :
+    "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
+  } : {}
+
+  route_table_id              = aws_route_table.private[tonumber(each.value.az_index)].id
+  destination_cidr_block      = lookup(each.value, "destination_cidr_block", null)
+  destination_ipv6_cidr_block = lookup(each.value, "destination_ipv6_cidr_block", null)
+
+  gateway_id                = lookup(each.value, "gateway_id", null)
+  nat_gateway_id            = lookup(each.value, "nat_gateway_id", null)
+  transit_gateway_id        = lookup(each.value, "transit_gateway_id", null)
+  vpc_peering_connection_id = lookup(each.value, "vpc_peering_connection_id", null)
+  network_interface_id      = lookup(each.value, "network_interface_id", null)
+  egress_only_gateway_id    = lookup(each.value, "egress_only_gateway_id", null)
+  carrier_gateway_id        = lookup(each.value, "carrier_gateway_id", null)
+  local_gateway_id          = lookup(each.value, "local_gateway_id", null)
+  core_network_arn          = lookup(each.value, "core_network_arn", null)
+
+  depends_on = [aws_route_table.private]
+
+  timeouts {
+    create = "5m"
+  }
 }
