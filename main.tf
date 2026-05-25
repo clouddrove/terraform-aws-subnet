@@ -429,7 +429,7 @@ resource "aws_route" "private_additional" {
     "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
   } : {}
 
-  route_table_id              = aws_route_table.private[tonumber(each.value.az_index)].id
+  route_table_id              = var.single_nat_gateway ? aws_route_table.private[0].id : aws_route_table.private[tonumber(each.value.az_index)].id
   destination_cidr_block      = lookup(each.value, "destination_cidr_block", null)
   destination_ipv6_cidr_block = lookup(each.value, "destination_ipv6_cidr_block", null)
 
