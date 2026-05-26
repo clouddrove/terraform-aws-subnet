@@ -63,5 +63,25 @@ output "private_acl" {
 
 output "nat_gateway_private_ip" {
   value       = aws_nat_gateway.private[*].private_ip
-  description = "The private IPv4 address to assign to the NAT Gateway. If you don't provide an address, a private IPv4 address will be automatically assigned."
+  description = "Private IPv4 address of each NAT Gateway."
+}
+
+output "nat_gateway_public_ip" {
+  value       = aws_eip.private[*].public_ip
+  description = "Public IPv4 address of each NAT Gateway EIP. Whitelist these in external firewalls."
+}
+
+output "nat_gateway_ids" {
+  value       = aws_nat_gateway.private[*].id
+  description = "IDs of created NAT Gateways."
+}
+
+output "public_subnet_azs" {
+  value       = aws_subnet.public[*].availability_zone
+  description = "Availability zones of created public subnets, in the same order as public_subnet_id."
+}
+
+output "private_subnet_azs" {
+  value       = aws_subnet.private[*].availability_zone
+  description = "Availability zones of created private subnets, in the same order as private_subnet_id."
 }

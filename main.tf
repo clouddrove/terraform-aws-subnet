@@ -8,6 +8,9 @@ locals {
   public_count      = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_count     = var.enable == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
   nat_gateway_count = var.enable == true && var.single_nat_gateway ? 1 : (var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0)
+  # When single_nat_gateway=true, only 1 route table is needed — all private subnets
+  # associate with index 0. Creating one per AZ produces orphaned tables with no routes.
+  private_rt_count = local.private_count > 0 && var.single_nat_gateway ? 1 : local.private_count
 
   public_additional_routes_expanded = var.enable ? flatten([
     for az_index, az in var.availability_zones : concat(
@@ -176,7 +179,7 @@ resource "aws_route" "public" {
 }
 
 resource "aws_route" "public_ipv6" {
-  count                       = local.public_count
+  count                       = var.enable_ipv6 ? local.public_count : 0
   route_table_id              = element(aws_route_table.public[*].id, count.index)
   gateway_id                  = var.igw_id
   destination_ipv6_cidr_block = var.public_rt_ipv6_destination_cidr
@@ -197,17 +200,16 @@ resource "aws_route_table_association" "public" {
 ## Below resource will deploy flow logs for public subnet.
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "public_subnet_flow_log" {
-  count                    = var.enable && var.enable_flow_log && local.public_count > 0 ? 1 : 0
+  count                    = var.enable && var.enable_flow_log ? local.public_count : 0
   log_destination_type     = var.flow_log_destination_type
   log_destination          = var.flow_log_destination_arn
   log_format               = var.flow_log_log_format
   iam_role_arn             = var.flow_log_iam_role_arn
   traffic_type             = var.flow_log_traffic_type
-  subnet_id                = element(aws_subnet.public[*].id, count.index)
+  subnet_id                = aws_subnet.public[count.index].id
   max_aggregation_interval = var.flow_log_max_aggregation_interval
   dynamic "destination_options" {
     for_each = var.flow_log_destination_type == "s3" ? [true] : []
-
     content {
       file_format                = var.flow_log_file_format
       hive_compatible_partitions = var.flow_log_hive_compatible_partitions
@@ -216,9 +218,7 @@ resource "aws_flow_log" "public_subnet_flow_log" {
   }
   tags = merge(
     module.public-labels.tags,
-    {
-      "Name" = format("%s-flowlog", module.public-labels.name)
-    }
+    { "Name" = format("%s-%s-flowlog", module.public-labels.name, element(var.availability_zones, count.index)) }
   )
 }
 
@@ -282,7 +282,7 @@ resource "aws_network_acl_rule" "private_inbound" {
 }
 
 resource "aws_network_acl_rule" "private_outbound" {
-  count           = var.enable && var.enable_private_acl && (var.type == "private" || var.type == "public-private") ? length(var.private_inbound_acl_rules) : 0
+  count           = var.enable && var.enable_private_acl && (var.type == "private" || var.type == "public-private") ? length(var.private_outbound_acl_rules) : 0
   network_acl_id  = aws_network_acl.private[0].id
   egress          = true
   rule_number     = var.private_outbound_acl_rules[count.index]["rule_number"]
@@ -300,7 +300,7 @@ resource "aws_network_acl_rule" "private_outbound" {
 ## Below resources will deploy route table and routes for private subnet and will be associated to private subnets.
 ##-----------------------------------------------------------------------------
 resource "aws_route_table" "private" {
-  count  = local.private_count
+  count  = local.private_rt_count
   vpc_id = var.vpc_id
   tags = merge(
     module.private-labels.tags,
@@ -314,7 +314,7 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   count          = local.private_count
   subnet_id      = element(aws_subnet.private[*].id, count.index)
-  route_table_id = element(aws_route_table.private[*].id, var.single_nat_gateway ? 0 : count.index, )
+  route_table_id = element(aws_route_table.private[*].id, var.single_nat_gateway ? 0 : count.index)
 }
 
 resource "aws_route" "nat_gateway" {
@@ -329,7 +329,8 @@ resource "aws_route" "nat_gateway" {
 ## Below resource will create Elastic IP (EIP) for nat gateway.
 ##----------------------------------------------------------------------------------
 resource "aws_eip" "private" {
-  count  = local.nat_gateway_count
+  # Only public NAT gateways need an EIP
+  count  = var.nat_gateway_connectivity_type == "public" ? local.nat_gateway_count : 0
   domain = "vpc"
   tags = merge(
     module.private-labels.tags,
@@ -346,32 +347,34 @@ resource "aws_eip" "private" {
 ## Below resource will deploy nat gateway for private subnets.
 ##----------------------------------------------------------------------------------
 resource "aws_nat_gateway" "private" {
-  count         = local.nat_gateway_count
-  allocation_id = element(aws_eip.private[*].id, count.index)
-  subnet_id     = length(aws_subnet.public) > 0 ? element(aws_subnet.public[*].id, count.index) : element(var.public_subnet_ids, count.index)
+  count             = local.nat_gateway_count
+  connectivity_type = var.nat_gateway_connectivity_type
+  allocation_id     = var.nat_gateway_connectivity_type == "public" ? element(aws_eip.private[*].id, count.index) : null
+  subnet_id         = length(aws_subnet.public) > 0 ? element(aws_subnet.public[*].id, count.index) : element(var.public_subnet_ids, count.index)
   tags = merge(
     module.private-labels.tags,
     {
       "Name" = format("%s%s%s-nat-gateway", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
     }
   )
+  # Ensures the IGW route (and therefore IGW itself) exists before NAT gateways are created
+  depends_on = [aws_route.public]
 }
 
 ##-----------------------------------------------------------------------------
 ## Below resource will deploy flow logs for private subnet.
 ##-----------------------------------------------------------------------------
 resource "aws_flow_log" "private_subnet_flow_log" {
-  count                    = var.enable && var.enable_flow_log && local.private_count > 0 ? 1 : 0
+  count                    = var.enable && var.enable_flow_log ? local.private_count : 0
   log_destination_type     = var.flow_log_destination_type
   log_destination          = var.flow_log_destination_arn
   log_format               = var.flow_log_log_format
   iam_role_arn             = var.flow_log_iam_role_arn
   traffic_type             = var.flow_log_traffic_type
-  subnet_id                = element(aws_subnet.private[*].id, count.index)
+  subnet_id                = aws_subnet.private[count.index].id
   max_aggregation_interval = var.flow_log_max_aggregation_interval
   dynamic "destination_options" {
     for_each = var.flow_log_destination_type == "s3" ? [true] : []
-
     content {
       file_format                = var.flow_log_file_format
       hive_compatible_partitions = var.flow_log_hive_compatible_partitions
@@ -380,9 +383,7 @@ resource "aws_flow_log" "private_subnet_flow_log" {
   }
   tags = merge(
     module.private-labels.tags,
-    {
-      "Name" = format("%s-flowlog", module.private-labels.name)
-    }
+    { "Name" = format("%s-%s-flowlog", module.private-labels.name, element(var.availability_zones, count.index)) }
   )
 }
 
@@ -428,7 +429,7 @@ resource "aws_route" "private_additional" {
     "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
   } : {}
 
-  route_table_id              = aws_route_table.private[tonumber(each.value.az_index)].id
+  route_table_id              = var.single_nat_gateway ? aws_route_table.private[0].id : aws_route_table.private[tonumber(each.value.az_index)].id
   destination_cidr_block      = lookup(each.value, "destination_cidr_block", null)
   destination_ipv6_cidr_block = lookup(each.value, "destination_ipv6_cidr_block", null)
 

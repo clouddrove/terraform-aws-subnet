@@ -385,6 +385,16 @@ variable "public_rt_ipv6_destination_cidr" {
   description = "The destination ipv6 CIDR block."
 }
 
+variable "nat_gateway_connectivity_type" {
+  type        = string
+  default     = "public"
+  description = "NAT Gateway connectivity type. public (default) creates a standard NAT with EIP. private creates a private NAT (no EIP, routes between VPCs/on-prem). Valid values: public, private."
+  validation {
+    condition     = contains(["public", "private"], var.nat_gateway_connectivity_type)
+    error_message = "nat_gateway_connectivity_type must be public or private."
+  }
+}
+
 variable "additional_public_routes_for_all" {
   description = <<-EOT
     Routes added to EVERY public route table (all AZs get the same routes).
