@@ -35,6 +35,7 @@
 | managedby | ManagedBy, eg 'CloudDrove'. | `string` | `"hello@clouddrove.com"` | no |
 | map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the public subnet should be assigned a public IP address. | `bool` | `false` | no |
 | name | Name  (e.g. `prod-subnet` or `subnet`). | `string` | `""` | no |
+| nat\_gateway\_connectivity\_type | NAT Gateway connectivity type. public (default) creates a standard NAT with EIP. private creates a private NAT (no EIP, routes between VPCs/on-prem). Valid values: public, private. | `string` | `"public"` | no |
 | nat\_gateway\_destination\_cidr\_block | Used to pass a custom destination route for private NAT Gateway. If not specified, the default 0.0.0.0/0 is used as a destination route | `string` | `"0.0.0.0/0"` | no |
 | nat\_gateway\_enabled | Flag to enable/disable NAT Gateways creation in public subnets. | `bool` | `false` | no |
 | private\_inbound\_acl\_rules | Private subnets inbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "deny",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
@@ -67,15 +68,19 @@
 
 | Name | Description |
 |------|-------------|
-| nat\_gateway\_private\_ip | The private IPv4 address to assign to the NAT Gateway. If you don't provide an address, a private IPv4 address will be automatically assigned. |
+| nat\_gateway\_ids | IDs of created NAT Gateways. |
+| nat\_gateway\_private\_ip | Private IPv4 address of each NAT Gateway. |
+| nat\_gateway\_public\_ip | Public IPv4 address of each NAT Gateway EIP. Whitelist these in external firewalls. |
 | private\_acl | The ID of the network ACL. |
 | private\_route\_tables\_id | The ID of the routing table. |
+| private\_subnet\_azs | Availability zones of created private subnets, in the same order as private\_subnet\_id. |
 | private\_subnet\_cidrs | CIDR blocks of the created private subnets. |
 | private\_subnet\_cidrs\_ipv6 | CIDR blocks of the created private subnets. |
 | private\_subnet\_id | The ID of the private subnet. |
 | private\_tags | A mapping of private tags to assign to the resource. |
 | public\_acl | The ID of the network ACL. |
 | public\_route\_tables\_id | The ID of the routing table. |
+| public\_subnet\_azs | Availability zones of created public subnets, in the same order as public\_subnet\_id. |
 | public\_subnet\_cidrs | CIDR blocks of the created public subnets. |
 | public\_subnet\_cidrs\_ipv6 | CIDR blocks of the created public subnets. |
 | public\_subnet\_id | The ID of the subnet. |
