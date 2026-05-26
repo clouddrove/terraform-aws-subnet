@@ -2,7 +2,7 @@
 # Copyright @ CloudDrove. All Right Reserved.
 
 ##-----------------------------------------------------------------------------
-## Locals declration to determine count of public subnet, private subnet, and nat gateway.
+## Locals declaration to determine count of public subnet, private subnet, and nat gateway.
 ##-----------------------------------------------------------------------------
 locals {
   public_count      = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
