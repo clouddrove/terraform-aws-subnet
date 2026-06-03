@@ -8,6 +8,7 @@ locals {
   public_count      = var.enable == true && (var.type == "public" || var.type == "public-private") ? length(var.availability_zones) : 0
   private_count     = var.enable == true && (var.type == "private" || var.type == "public-private") ? length(var.availability_zones) : 0
   nat_gateway_count = var.enable == true && var.single_nat_gateway ? 1 : (var.enable == true && (var.type == "private" || var.type == "public-private") && var.nat_gateway_enabled == true ? length(var.availability_zones) : 0)
+
   # When single_nat_gateway=true, only 1 route table is needed — all private subnets
   # associate with index 0. Creating one per AZ produces orphaned tables with no routes.
   private_rt_count = local.private_count > 0 && var.single_nat_gateway ? 1 : local.private_count
@@ -45,7 +46,23 @@ locals {
       ]
     )
   ]) : []
+
+  # Group duplicate routes when using a single private route table
+  private_additional_routes_grouped = var.single_nat_gateway ? {
+    for r in local.private_additional_routes_expanded :
+    lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", "")) => r...
+  } : {}
+
+  # Deduplicated routes used by aws_route.private_additional
+  private_additional_routes = var.single_nat_gateway ? {
+    for destination, routes in local.private_additional_routes_grouped :
+    destination => routes[0]
+  } : {
+    for r in local.private_additional_routes_expanded :
+    "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
+  }
 }
+
 ##-----------------------------------------------------------------------------
 ## Labels module called that will be used for naming and tags.
 ##-----------------------------------------------------------------------------
@@ -424,10 +441,7 @@ resource "aws_route" "public_additional" {
 ## Routes are only created when caller explicitly passes values.
 ##-----------------------------------------------------------------------------
 resource "aws_route" "private_additional" {
-  for_each = var.enable ? {
-    for r in local.private_additional_routes_expanded :
-    "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
-  } : {}
+  for_each = var.enable ? local.private_additional_routes : {}
 
   route_table_id              = var.single_nat_gateway ? aws_route_table.private[0].id : aws_route_table.private[tonumber(each.value.az_index)].id
   destination_cidr_block      = lookup(each.value, "destination_cidr_block", null)
