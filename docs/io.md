@@ -61,7 +61,7 @@
 | public\_subnet\_private\_dns\_hostname\_type\_on\_launch | The type of hostnames to assign to instances in the subnet at launch. For IPv6-only subnets, an instance DNS name must be based on the instance ID. For dual-stack and IPv4-only subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID. Valid values: `ip-name`, `resource-name` | `string` | `null` | no |
 | repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-subnet"` | no |
 | single\_nat\_gateway | Enable for only single NAT Gateway in one Availability Zone | `bool` | `false` | no |
-| type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
+| type | Type of subnets to create (`private`, `public`, or `public-private`). | `string` | `""` | no |
 | vpc\_id | VPC ID. | `string` | n/a | yes |
 
 ## Outputs
