@@ -6,7 +6,7 @@ on:
       - '*.tf'
 jobs:
   tf-lint:
-    if: github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.fork != true
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-lint.yml@v2
     secrets:
       GITHUB: ${{ secrets.GITHUB_TOKEN }}
