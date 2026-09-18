@@ -71,7 +71,12 @@ variable "availability_zones" {
 variable "type" {
   type        = string
   default     = ""
-  description = "Type of subnets to create (`private` or `public`)."
+  description = "Type of subnets to create (`private`, `public`, or `public-private`)."
+
+  validation {
+    condition     = contains(["", "private", "public", "public-private"], var.type)
+    error_message = "The type must be `private`, `public`, or `public-private`."
+  }
 }
 
 variable "vpc_id" {
