@@ -347,7 +347,7 @@ variable "private_inbound_acl_rules" {
   default = [
     {
       rule_number = 100
-      rule_action = "deny"
+      rule_action = "allow"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
@@ -362,7 +362,7 @@ variable "private_outbound_acl_rules" {
   default = [
     {
       rule_number = 100
-      rule_action = "deny"
+      rule_action = "allow"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
