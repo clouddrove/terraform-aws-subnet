@@ -1,6 +1,15 @@
 locals {
-  name        = "app"
+  name        = "clouddrove"
   environment = "test"
+  region      = "us-east-1"
+  label_order = ["name", "environment"]
+}
+
+####----------------------------------------------------------------------------------
+## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
+####----------------------------------------------------------------------------------
+provider "aws" {
+  region = local.region
 }
 
 ##-----------------------------------------------------------------------------
@@ -11,10 +20,11 @@ locals {
 #tfsec:ignore:aws-ec2-no-public-ingress-acl
 module "subnets" {
   source              = "./../../"
-  name                = local.name
+  name                = "${local.name}-subnet"
   environment         = local.environment
+  label_order         = local.label_order
   nat_gateway_enabled = true
-  availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  availability_zones  = ["${local.region}-1a", "${local.region}-1b", "${local.region}-1c"]
   vpc_id              = "vpv_id-xxxxxxx"
   type                = "public-private"
   igw_id              = "vpc_igw_id-xxxxxxx"

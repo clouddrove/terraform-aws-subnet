@@ -1,10 +1,15 @@
-provider "aws" {
-  region = "eu-west-1"
+locals {
+  name        = "clouddrove"
+  environment = "test"
+  region      = "us-east-1"
+  label_order = ["name", "environment"]
 }
 
-locals {
-  name        = "app"
-  environment = "test"
+####----------------------------------------------------------------------------------
+## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
+####----------------------------------------------------------------------------------
+provider "aws" {
+  region = local.region
 }
 
 ##-----------------------------------------------------------------------------
@@ -12,9 +17,10 @@ locals {
 ##-----------------------------------------------------------------------------
 module "vpc" {
   source                              = "clouddrove/vpc/aws"
-  version                             = "2.0.0"
-  name                                = local.name
+  version                             = "2.0.5"
+  name                                = "${local.name}-vpc"
   environment                         = local.environment
+  label_order                         = local.label_order
   cidr_block                          = "10.0.0.0/16"
   enable_flow_log                     = true # Flow logs will be stored in cloudwatch log group. Variables passed in default.
   create_flow_log_cloudwatch_iam_role = true
@@ -34,9 +40,10 @@ module "subnets" {
   source              = "./../../"
   nat_gateway_enabled = true
   single_nat_gateway  = true
-  name                = local.name
+  name                = "${local.name}-subnet"
   environment         = local.environment
-  availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  label_order         = local.label_order
+  availability_zones  = ["${local.region}a", "${local.region}b", "${local.region}c"]
   vpc_id              = module.vpc.vpc_id
   type                = "public-private"
   igw_id              = module.vpc.igw_id

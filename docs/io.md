@@ -12,7 +12,7 @@
 | delimiter | Delimiter to be used between `organization`, `environment`, `name` and `attributes`. | `string` | `"-"` | no |
 | enable | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enable\_flow\_log | Enable subnet\_flow\_log logs. | `bool` | `false` | no |
-| enable\_ipv6 | Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block | `bool` | `false` | no |
+| enable\_ipv6 | Enable IPv6 on the subnets. The VPC must already have an IPv6 CIDR block passed via `ipv6_cidr_block`, or explicit per-subnet IPv6 CIDRs must be provided. | `bool` | `false` | no |
 | enable\_private\_acl | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | enable\_public\_acl | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
@@ -30,25 +30,25 @@
 | igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`). | `string` | `""` | no |
 | ipv4\_private\_cidrs | Subnet CIDR blocks (e.g. `10.0.0.0/16`). | `list(any)` | `[]` | no |
 | ipv4\_public\_cidrs | Subnet CIDR blocks (e.g. `10.0.0.0/16`). | `list(any)` | `[]` | no |
-| ipv6\_cidr\_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`). | `string` | `null` | no |
+| ipv6\_cidr\_block | VPC IPv6 CIDR divided into /64 subnet CIDRs when `enable_ipv6 = true` (e.g. `2a05:d018:832:ca00::/56`). | `string` | `null` | no |
 | label\_order | Label order, e.g. `name`,`Environment`. | `list(any)` | <pre>[<br>  "name",<br>  "environment"<br>]</pre> | no |
 | managedby | ManagedBy, eg 'CloudDrove'. | `string` | `"hello@clouddrove.com"` | no |
 | map\_public\_ip\_on\_launch | Specify true to indicate that instances launched into the public subnet should be assigned a public IP address. | `bool` | `false` | no |
 | name | Name  (e.g. `prod-subnet` or `subnet`). | `string` | `""` | no |
 | nat\_gateway\_connectivity\_type | NAT Gateway connectivity type. public (default) creates a standard NAT with EIP. private creates a private NAT (no EIP, routes between VPCs/on-prem). Valid values: public, private. | `string` | `"public"` | no |
 | nat\_gateway\_destination\_cidr\_block | Used to pass a custom destination route for private NAT Gateway. If not specified, the default 0.0.0.0/0 is used as a destination route | `string` | `"0.0.0.0/0"` | no |
-| nat\_gateway\_enabled | Flag to enable/disable NAT Gateways creation in public subnets. | `bool` | `false` | no |
-| private\_inbound\_acl\_rules | Private subnets inbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "deny",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
-| private\_ipv6\_cidrs | Private Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`). | `list(any)` | `[]` | no |
-| private\_outbound\_acl\_rules | Private subnets outbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "deny",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
+| nat\_gateway\_enabled | Enable NAT Gateway creation for private subnets. Set `single_nat_gateway = true` to share one gateway across all private subnets. | `bool` | `false` | no |
+| private\_inbound\_acl\_rules | Private subnets inbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "allow",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
+| private\_ipv6\_cidrs | Explicit IPv6 /64 CIDRs for private subnets, one per AZ. When empty, CIDRs are derived from `ipv6_cidr_block`. | `list(string)` | `[]` | no |
+| private\_outbound\_acl\_rules | Private subnets outbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "allow",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | private\_subnet\_assign\_ipv6\_address\_on\_creation | Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address. | `bool` | `false` | no |
 | private\_subnet\_enable\_dns64 | Indicates whether DNS queries made to the Amazon-provided DNS Resolver in this subnet should return synthetic IPv6 addresses for IPv4-only destinations. Default: `true` | `bool` | `false` | no |
 | private\_subnet\_enable\_resource\_name\_dns\_a\_record\_on\_launch | Indicates whether to respond to DNS queries for instance hostnames with DNS A records. Default: `false` | `bool` | `false` | no |
 | private\_subnet\_enable\_resource\_name\_dns\_aaaa\_record\_on\_launch | Indicates whether to respond to DNS queries for instance hostnames with DNS AAAA records. Default: `true` | `bool` | `false` | no |
-| private\_subnet\_ipv6\_native | Indicates whether to create an IPv6-only private subnet. Default: `false` | `bool` | `false` | no |
+| private\_subnet\_ipv6\_native | Create IPv6-only private subnets. Requires `enable_ipv6 = true` and no IPv4 CIDRs. | `bool` | `false` | no |
 | private\_subnet\_private\_dns\_hostname\_type\_on\_launch | The type of hostnames to assign to instances in the subnet at launch. For IPv6-only subnets, an instance DNS name must be based on the instance ID. For dual-stack and IPv4-only subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID. Valid values: `ip-name`, `resource-name` | `string` | `null` | no |
 | public\_inbound\_acl\_rules | Public subnets inbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "allow",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
-| public\_ipv6\_cidrs | Public Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`). | `list(any)` | `[]` | no |
+| public\_ipv6\_cidrs | Explicit IPv6 /64 CIDRs for public subnets, one per AZ. When empty, CIDRs are derived from `ipv6_cidr_block`. | `list(string)` | `[]` | no |
 | public\_outbound\_acl\_rules | Public subnets outbound network ACLs | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "allow",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | public\_rt\_ipv4\_destination\_cidr | The destination ipv4 CIDR block. | `string` | `"0.0.0.0/0"` | no |
 | public\_rt\_ipv6\_destination\_cidr | The destination ipv6 CIDR block. | `string` | `"::/0"` | no |
@@ -57,11 +57,11 @@
 | public\_subnet\_enable\_resource\_name\_dns\_a\_record\_on\_launch | Indicates whether to respond to DNS queries for instance hostnames with DNS A records. Default: `false` | `bool` | `false` | no |
 | public\_subnet\_enable\_resource\_name\_dns\_aaaa\_record\_on\_launch | Indicates whether to respond to DNS queries for instance hostnames with DNS AAAA records. Default: `true` | `bool` | `false` | no |
 | public\_subnet\_ids | A list of public subnet ids. | `list(string)` | `[]` | no |
-| public\_subnet\_ipv6\_native | Indicates whether to create an IPv6-only public subnet. Default: `false` | `bool` | `false` | no |
+| public\_subnet\_ipv6\_native | Create IPv6-only public subnets. Requires `enable_ipv6 = true` and no IPv4 CIDRs. | `bool` | `false` | no |
 | public\_subnet\_private\_dns\_hostname\_type\_on\_launch | The type of hostnames to assign to instances in the subnet at launch. For IPv6-only subnets, an instance DNS name must be based on the instance ID. For dual-stack and IPv4-only subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID. Valid values: `ip-name`, `resource-name` | `string` | `null` | no |
 | repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-subnet"` | no |
-| single\_nat\_gateway | Enable for only single NAT Gateway in one Availability Zone | `bool` | `false` | no |
-| type | Type of subnets to create (`private` or `public`). | `string` | `""` | no |
+| single\_nat\_gateway | When NAT is enabled, create one NAT Gateway and route all private subnets through it. | `bool` | `false` | no |
+| type | Type of subnets to create (`private`, `public`, or `public-private`). | `string` | `""` | no |
 | vpc\_id | VPC ID. | `string` | n/a | yes |
 
 ## Outputs
