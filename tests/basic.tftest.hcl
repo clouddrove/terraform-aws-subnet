@@ -75,3 +75,42 @@ run "invalid_type_is_rejected" {
 
   expect_failures = [var.type]
 }
+
+run "single_nat_does_not_duplicate_additional_private_routes" {
+  command = plan
+
+  variables {
+    type               = "public-private"
+    single_nat_gateway = true
+    additional_private_routes_for_all = [
+      {
+        destination_cidr_block = "10.100.0.0/16"
+        gateway_id             = "vgw-0123456789abcdef0"
+      },
+    ]
+  }
+
+  assert {
+    condition     = length(aws_route.private_additional) == 1
+    error_message = "With one shared private route table the same destination must be created once, not once per AZ."
+  }
+}
+
+run "per_az_nat_keeps_one_additional_private_route_per_az" {
+  command = plan
+
+  variables {
+    type = "public-private"
+    additional_private_routes_for_all = [
+      {
+        destination_cidr_block = "10.100.0.0/16"
+        gateway_id             = "vgw-0123456789abcdef0"
+      },
+    ]
+  }
+
+  assert {
+    condition     = length(aws_route.private_additional) == 2
+    error_message = "Each AZ has its own private route table, so each needs its own additional route."
+  }
+}

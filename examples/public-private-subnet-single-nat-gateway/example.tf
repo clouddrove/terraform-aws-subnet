@@ -40,14 +40,42 @@ module "subnets" {
   source              = "./../../"
   nat_gateway_enabled = true
   single_nat_gateway  = true
-  name                = "${local.name}-subnet"
+  name                = local.name
   environment         = local.environment
-  label_order         = local.label_order
-  availability_zones  = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   vpc_id              = module.vpc.vpc_id
   type                = "public-private"
   igw_id              = module.vpc.igw_id
   cidr_block          = module.vpc.vpc_cidr_block
   ipv6_cidr_block     = module.vpc.ipv6_cidr_block
   enable_ipv6         = false
+
+  # Restrictive private NACL: everything from inside the VPC, plus ephemeral ports from
+  # anywhere so return traffic coming back through the NAT gateway is allowed.
+  private_inbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = module.vpc.vpc_cidr_block
+    },
+    {
+      rule_number = 110
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      rule_number = 120
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "udp"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
 }

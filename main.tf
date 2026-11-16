@@ -12,7 +12,7 @@ locals {
   private_count = local.create_private ? length(var.availability_zones) : 0
 
   # NAT gateways only make sense when there are private subnets to route through them.
-  nat_gateway_count = local.private_count == 0 || !var.nat_gateway_enabled ? 0 : (var.single_nat_gateway ? 1 : length(var.availability_zones))
+  nat_gateway_count = local.private_count == 0 ? 0 : (var.single_nat_gateway ? 1 : (var.nat_gateway_enabled ? length(var.availability_zones) : 0))
 
   # When single_nat_gateway=true, only 1 route table is needed — all private subnets
   # associate with index 0. Creating one per AZ produces orphaned tables with no routes.
@@ -22,7 +22,7 @@ locals {
   public_tags  = merge(var.tags, module.public-labels.tags)
   private_tags = merge(var.tags, module.private-labels.tags)
 
-  public_additional_routes_expanded = local.create_public ? flatten([
+  public_additional_routes_expanded = var.enable ? flatten([
     for az_index, az in var.availability_zones : concat(
       [
         for route in var.additional_public_routes_for_all : merge(route, {
@@ -39,22 +39,38 @@ locals {
     )
   ]) : []
 
-  private_additional_routes_expanded = local.create_private ? flatten([
+  # rt_index is the private route table a route lands on: one per AZ, or just index 0 when
+  # single_nat_gateway = true (all private subnets share one route table).
+  private_additional_routes_expanded = var.enable ? flatten([
     for az_index, az in var.availability_zones : concat(
       [
         for route in var.additional_private_routes_for_all : merge(route, {
           az_index = tostring(az_index)
           az_name  = az
+          rt_index = var.single_nat_gateway ? "0" : tostring(az_index)
         })
       ],
       [
         for route in lookup(var.additional_private_routes_per_subnet, az, []) : merge(route, {
           az_index = tostring(az_index)
           az_name  = az
+          rt_index = var.single_nat_gateway ? "0" : tostring(az_index)
         })
       ]
     )
   ]) : []
+
+  # Same destination on the same route table must only be created once, otherwise AWS rejects
+  # the duplicate (RouteAlreadyExists) at apply time. Keys stay "<az>|<destination>" so state
+  # addresses do not change when single_nat_gateway = false.
+  private_additional_routes_by_rt = {
+    for r in local.private_additional_routes_expanded :
+    "${r.rt_index}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r...
+  }
+  private_additional_routes = {
+    for g in values(local.private_additional_routes_by_rt) :
+    "${g[0].az_name}|${lookup(g[0], "destination_cidr_block", lookup(g[0], "destination_ipv6_cidr_block", ""))}" => g[0]
+  }
 }
 ##-----------------------------------------------------------------------------
 ## Labels module called that will be used for naming and tags.
@@ -96,8 +112,8 @@ resource "aws_subnet" "public" {
   count                                          = local.public_count
   vpc_id                                         = var.vpc_id
   availability_zone                              = element(var.availability_zones, count.index)
-  cidr_block                                     = var.public_subnet_ipv6_native ? null : (length(var.ipv4_public_cidrs) == 0 ? cidrsubnet(var.cidr_block, ceil(log(local.public_count * 2, 2)), local.public_count + count.index) : var.ipv4_public_cidrs[count.index])
-  ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.public_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 64 - tonumber(split("/", var.ipv6_cidr_block)[1]), count.index + 1) : var.public_ipv6_cidrs[count.index]) : null
+  cidr_block                                     = length(var.ipv4_public_cidrs) == 0 ? cidrsubnet(var.cidr_block, ceil(log(local.public_count * 2, 2)), local.public_count + count.index) : var.ipv4_public_cidrs[count.index]
+  ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.public_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 8, count.index + 1) : var.public_ipv6_cidrs[count.index]) : null
   map_public_ip_on_launch                        = var.map_public_ip_on_launch
   assign_ipv6_address_on_creation                = var.enable_ipv6 && var.public_subnet_ipv6_native ? true : var.public_subnet_assign_ipv6_address_on_creation
   private_dns_hostname_type_on_launch            = var.public_subnet_private_dns_hostname_type_on_launch
@@ -106,7 +122,7 @@ resource "aws_subnet" "public" {
   enable_resource_name_dns_a_record_on_launch    = !var.public_subnet_ipv6_native && var.public_subnet_enable_resource_name_dns_a_record_on_launch
   enable_dns64                                   = var.enable_ipv6 && var.public_subnet_enable_dns64
   tags = merge(
-    var.tags, var.extra_public_tags, module.public-labels.tags,
+    local.public_tags, var.extra_public_tags,
     {
       "Name" = format("%s%s%s", module.public-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
@@ -124,28 +140,12 @@ resource "aws_subnet" "public" {
       error_message = "igw_id is required when type is `public` or `public-private` (the public route tables need an Internet Gateway)."
     }
     precondition {
-      condition     = var.public_subnet_ipv6_native || length(var.ipv4_public_cidrs) > 0 || var.cidr_block != null
-      error_message = "Set either cidr_block (subnets are derived from it) or ipv4_public_cidrs unless creating IPv6-native subnets."
+      condition     = length(var.ipv4_public_cidrs) > 0 || var.cidr_block != null
+      error_message = "Set either cidr_block (subnets are derived from it) or ipv4_public_cidrs."
     }
     precondition {
       condition     = length(var.ipv4_public_cidrs) == 0 || length(var.ipv4_public_cidrs) == length(var.availability_zones)
       error_message = "ipv4_public_cidrs must contain exactly one CIDR per availability zone."
-    }
-    precondition {
-      condition     = !var.enable_ipv6 || var.ipv6_cidr_block != null || length(var.public_ipv6_cidrs) == length(var.availability_zones)
-      error_message = "Set ipv6_cidr_block or provide one public_ipv6_cidrs entry per AZ when enable_ipv6 = true."
-    }
-    precondition {
-      condition     = !var.enable_ipv6 || length(var.public_ipv6_cidrs) == 0 || length(var.public_ipv6_cidrs) == length(var.availability_zones)
-      error_message = "public_ipv6_cidrs must contain exactly one CIDR per availability zone."
-    }
-    precondition {
-      condition     = !var.enable_ipv6 || length(var.public_ipv6_cidrs) > 0 || try(pow(2, 64 - tonumber(split("/", var.ipv6_cidr_block)[1])) > local.public_count + local.private_count, false)
-      error_message = "ipv6_cidr_block does not contain enough /64 ranges for the requested subnets; provide explicit public_ipv6_cidrs instead."
-    }
-    precondition {
-      condition     = !var.public_subnet_ipv6_native || (var.enable_ipv6 && length(var.ipv4_public_cidrs) == 0)
-      error_message = "IPv6-native public subnets require enable_ipv6 = true and cannot use ipv4_public_cidrs."
     }
   }
 }
@@ -272,8 +272,8 @@ resource "aws_subnet" "private" {
   count                                          = local.private_count
   vpc_id                                         = var.vpc_id
   availability_zone                              = element(var.availability_zones, count.index)
-  cidr_block                                     = var.private_subnet_ipv6_native ? null : (length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(var.cidr_block, local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)), count.index) : var.ipv4_private_cidrs[count.index])
-  ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.private_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 64 - tonumber(split("/", var.ipv6_cidr_block)[1]), local.public_count + count.index + 1) : var.private_ipv6_cidrs[count.index]) : null
+  cidr_block                                     = length(var.ipv4_private_cidrs) == 0 ? cidrsubnet(var.cidr_block, local.public_count == 0 ? ceil(log(local.private_count * 2, 2)) : ceil(log(local.public_count * 2, 2)), count.index) : var.ipv4_private_cidrs[count.index]
+  ipv6_cidr_block                                = var.enable_ipv6 ? (length(var.private_ipv6_cidrs) == 0 ? cidrsubnet(var.ipv6_cidr_block, 8, local.public_count + count.index + 1) : var.private_ipv6_cidrs[count.index]) : null
   assign_ipv6_address_on_creation                = var.enable_ipv6 && var.private_subnet_ipv6_native ? true : var.private_subnet_assign_ipv6_address_on_creation
   private_dns_hostname_type_on_launch            = var.private_subnet_private_dns_hostname_type_on_launch
   ipv6_native                                    = var.enable_ipv6 && var.private_subnet_ipv6_native
@@ -282,7 +282,7 @@ resource "aws_subnet" "private" {
   enable_dns64                                   = var.enable_ipv6 && var.private_subnet_enable_dns64
 
   tags = merge(
-    var.tags, var.extra_private_tags, module.private-labels.tags,
+    local.private_tags, var.extra_private_tags,
     {
       "Name" = format("%s%s%s", module.private-labels.id, var.delimiter, element(var.availability_zones, count.index))
       "AZ"   = element(var.availability_zones, count.index)
@@ -297,28 +297,12 @@ resource "aws_subnet" "private" {
     ]
 
     precondition {
-      condition     = var.private_subnet_ipv6_native || length(var.ipv4_private_cidrs) > 0 || var.cidr_block != null
-      error_message = "Set either cidr_block (subnets are derived from it) or ipv4_private_cidrs unless creating IPv6-native subnets."
+      condition     = length(var.ipv4_private_cidrs) > 0 || var.cidr_block != null
+      error_message = "Set either cidr_block (subnets are derived from it) or ipv4_private_cidrs."
     }
     precondition {
       condition     = length(var.ipv4_private_cidrs) == 0 || length(var.ipv4_private_cidrs) == length(var.availability_zones)
       error_message = "ipv4_private_cidrs must contain exactly one CIDR per availability zone."
-    }
-    precondition {
-      condition     = !var.enable_ipv6 || var.ipv6_cidr_block != null || length(var.private_ipv6_cidrs) == length(var.availability_zones)
-      error_message = "Set ipv6_cidr_block or provide one private_ipv6_cidrs entry per AZ when enable_ipv6 = true."
-    }
-    precondition {
-      condition     = !var.enable_ipv6 || length(var.private_ipv6_cidrs) == 0 || length(var.private_ipv6_cidrs) == length(var.availability_zones)
-      error_message = "private_ipv6_cidrs must contain exactly one CIDR per availability zone."
-    }
-    precondition {
-      condition     = !var.enable_ipv6 || length(var.private_ipv6_cidrs) > 0 || try(pow(2, 64 - tonumber(split("/", var.ipv6_cidr_block)[1])) > local.public_count + local.private_count, false)
-      error_message = "ipv6_cidr_block does not contain enough /64 ranges for the requested subnets; provide explicit private_ipv6_cidrs instead."
-    }
-    precondition {
-      condition     = !var.private_subnet_ipv6_native || (var.enable_ipv6 && length(var.ipv4_private_cidrs) == 0)
-      error_message = "IPv6-native private subnets require enable_ipv6 = true and cannot use ipv4_private_cidrs."
     }
   }
 }
@@ -506,12 +490,9 @@ resource "aws_route" "public_additional" {
 ## Routes are only created when caller explicitly passes values.
 ##-----------------------------------------------------------------------------
 resource "aws_route" "private_additional" {
-  for_each = {
-    for r in local.private_additional_routes_expanded :
-    "${r.az_name}|${lookup(r, "destination_cidr_block", lookup(r, "destination_ipv6_cidr_block", ""))}" => r
-  }
+  for_each = local.private_additional_routes
 
-  route_table_id              = var.single_nat_gateway ? aws_route_table.private[0].id : aws_route_table.private[tonumber(each.value.az_index)].id
+  route_table_id              = aws_route_table.private[tonumber(each.value.rt_index)].id
   destination_cidr_block      = lookup(each.value, "destination_cidr_block", null)
   destination_ipv6_cidr_block = lookup(each.value, "destination_ipv6_cidr_block", null)
 

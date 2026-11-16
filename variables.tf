@@ -45,7 +45,7 @@ variable "delimiter" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Additional tags applied to every resource created by this module (e.g. `{ Team = \"platform\" }`). Generated label tags take precedence for duplicate keys."
+  description = "Additional tags applied to every resource created by this module (e.g. `{ Team = \"platform\" }`). Label tags (Name, Environment, ...) take precedence."
 }
 
 variable "extra_public_tags" {
@@ -76,11 +76,6 @@ variable "availability_zones" {
   validation {
     condition     = length(var.availability_zones) == length(distinct(var.availability_zones))
     error_message = "availability_zones must not contain duplicates."
-  }
-
-  validation {
-    condition     = !var.enable || !contains(["private", "public", "public-private"], var.type) || length(var.availability_zones) > 0
-    error_message = "availability_zones must contain at least one AZ when enabled and type is set."
   }
 }
 
@@ -117,8 +112,8 @@ variable "ipv6_cidr_block" {
   description = "IPv6 CIDR block of the VPC, divided into /64 subnet CIDRs when `enable_ipv6 = true` (e.g. `2a05:d018:832:ca00::/56`)."
 
   validation {
-    condition     = var.ipv6_cidr_block == null || (can(cidrhost(var.ipv6_cidr_block, 0)) && can(regex(":", var.ipv6_cidr_block)) && try(tonumber(split("/", var.ipv6_cidr_block)[1]) <= 64, false))
-    error_message = "ipv6_cidr_block must be a valid IPv6 CIDR with a prefix length of /64 or shorter (e.g. `2a05:d018:832:ca00::/56`)."
+    condition     = var.ipv6_cidr_block == null || can(cidrhost(var.ipv6_cidr_block, 0))
+    error_message = "ipv6_cidr_block must be a valid IPv6 CIDR (e.g. `2a05:d018:832:ca00::/56`)."
   }
 }
 
@@ -155,7 +150,7 @@ variable "enable_private_acl" {
 variable "nat_gateway_enabled" {
   type        = bool
   default     = false
-  description = "Enable NAT Gateway creation for private subnets. Set single_nat_gateway = true to share one gateway across all private subnets."
+  description = "Flag to enable/disable NAT Gateways creation in public subnets."
 }
 
 variable "enable_flow_log" {
@@ -245,22 +240,12 @@ variable "public_ipv6_cidrs" {
   type        = list(string)
   default     = []
   description = "Public Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
-
-  validation {
-    condition     = alltrue([for c in var.public_ipv6_cidrs : can(cidrhost(c, 0)) && can(regex(":", c)) && try(tonumber(split("/", c)[1]) == 64, false)])
-    error_message = "Every public_ipv6_cidrs entry must be a valid IPv6 /64 CIDR block."
-  }
 }
 
 variable "private_ipv6_cidrs" {
   type        = list(string)
   default     = []
   description = "Private Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
-
-  validation {
-    condition     = alltrue([for c in var.private_ipv6_cidrs : can(cidrhost(c, 0)) && can(regex(":", c)) && try(tonumber(split("/", c)[1]) == 64, false)])
-    error_message = "Every private_ipv6_cidrs entry must be a valid IPv6 /64 CIDR block."
-  }
 }
 
 variable "ipv4_public_cidrs" {
@@ -287,7 +272,7 @@ variable "ipv4_private_cidrs" {
 variable "single_nat_gateway" {
   type        = bool
   default     = false
-  description = "When nat_gateway_enabled is true, create one NAT Gateway and route all private subnets through it."
+  description = "Enable for only single NAT Gateway in one Availability Zone"
 }
 
 variable "public_subnet_assign_ipv6_address_on_creation" {
@@ -317,13 +302,13 @@ variable "private_subnet_private_dns_hostname_type_on_launch" {
 variable "public_subnet_ipv6_native" {
   type        = bool
   default     = false
-  description = "Create IPv6-only public subnets. Requires enable_ipv6 = true and no IPv4 CIDRs."
+  description = "Indicates whether to create an IPv6-only public subnet. Default: `false`"
 }
 
 variable "private_subnet_ipv6_native" {
   type        = bool
   default     = false
-  description = "Create IPv6-only private subnets. Requires enable_ipv6 = true and no IPv4 CIDRs."
+  description = "Indicates whether to create an IPv6-only private subnet. Default: `false`"
 }
 
 variable "enable_ipv6" {

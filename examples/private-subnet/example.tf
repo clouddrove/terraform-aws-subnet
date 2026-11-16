@@ -12,6 +12,7 @@ provider "aws" {
   region = local.region
 }
 
+
 ##-----------------------------------------------------------------------------
 ## Vpc Module call.
 ##-----------------------------------------------------------------------------
@@ -47,5 +48,36 @@ module "private-subnets" {
   type                = "private"
   cidr_block          = module.vpc.vpc_cidr_block
   ipv6_cidr_block     = module.vpc.ipv6_cidr_block
-  public_subnet_ids   = ["subnet-xxxxxxx", "subnet-xxxxxxx"]
+  # One existing public subnet per AZ (NAT gateways are placed in them, index-aligned with availability_zones).
+  # Alternatively pass a single ID and set single_nat_gateway = true.
+  public_subnet_ids = ["subnet-xxxxxxx", "subnet-yyyyyyy", "subnet-zzzzzzz"]
+
+  # Restrictive private NACL: all traffic from inside the VPC, plus ephemeral ports
+  # from anywhere so return traffic coming back through the NAT gateway is allowed.
+  private_inbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = module.vpc.vpc_cidr_block
+    },
+    {
+      rule_number = 110
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      rule_number = 120
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "udp"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
 }
