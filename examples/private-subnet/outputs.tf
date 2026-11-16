@@ -1,6 +1,6 @@
 output "private_subnet_cidrs" {
   value       = module.private-subnets.private_subnet_cidrs
-  description = "The ID of the subnet."
+  description = "CIDR blocks of the private subnets."
 }
 
 output "private_tags" {

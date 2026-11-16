@@ -5,9 +5,6 @@ locals {
   label_order = ["name", "environment"]
 }
 
-####----------------------------------------------------------------------------------
-## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
-####----------------------------------------------------------------------------------
 provider "aws" {
   region = local.region
 }
@@ -88,6 +85,22 @@ module "subnets" {
       to_port     = 0
       protocol    = "-1"
       cidr_block  = module.vpc.vpc_cidr_block
+    },
+    {
+      rule_number = 110
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      rule_number = 120
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "udp"
+      cidr_block  = "0.0.0.0/0"
     }
   ]
   private_outbound_acl_rules = [
@@ -97,7 +110,7 @@ module "subnets" {
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
-      cidr_block  = module.vpc.vpc_cidr_block
+      cidr_block  = "0.0.0.0/0"
     }
   ]
 
@@ -131,7 +144,7 @@ module "subnets" {
   ##---------------------------------------------------------------------------
 
   # Mode 1: Same route added to ALL public route tables.
-  # eu-west-1a, eu-west-1b and eu-west-1c all get this entry.
+  # All three public route tables get this entry.
   additional_public_routes_for_all = [
     {
       destination_cidr_block = "10.100.0.0/16"
@@ -140,8 +153,7 @@ module "subnets" {
   ]
 
   # Mode 2: Different route per specific public subnet.
-  # AZ key must match exactly what is passed in availability_zones.
-  # Using local.region ensures one place to change the region.
+  # AZ keys must match the availability_zones values above.
 
   additional_public_routes_per_subnet = {
     "${local.region}a" = [
@@ -167,8 +179,7 @@ module "subnets" {
   ]
 
   # Mode 2: Different route per specific private subnet.
-  # Only eu-west-1a will get this extra entry.
-  # eu-west-1b and eu-west-1c only get the for_all route above.
+  # Only the first AZ gets this extra entry. The other AZs only get the for_all route.
   additional_private_routes_per_subnet = {
     "${local.region}a" = [
       {

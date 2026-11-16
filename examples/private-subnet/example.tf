@@ -5,9 +5,6 @@ locals {
   label_order = ["name", "environment"]
 }
 
-####----------------------------------------------------------------------------------
-## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
-####----------------------------------------------------------------------------------
 provider "aws" {
   region = local.region
 }
@@ -52,8 +49,7 @@ module "private-subnets" {
   # Alternatively pass a single ID and set single_nat_gateway = true.
   public_subnet_ids = ["subnet-xxxxxxx", "subnet-yyyyyyy", "subnet-zzzzzzz"]
 
-  # Restrictive private NACL: all traffic from inside the VPC, plus ephemeral ports
-  # from anywhere so return traffic coming back through the NAT gateway is allowed.
+  # Custom rules for VPC traffic and return traffic from public endpoints.
   private_inbound_acl_rules = [
     {
       rule_number = 100
@@ -79,5 +75,17 @@ module "private-subnets" {
       protocol    = "udp"
       cidr_block  = "0.0.0.0/0"
     },
+  ]
+
+  # Allow workloads to reach their destinations, including the NAT gateway.
+  private_outbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    }
   ]
 }

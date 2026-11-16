@@ -5,9 +5,6 @@ locals {
   label_order = ["name", "environment"]
 }
 
-####----------------------------------------------------------------------------------
-## Provider block added, Use the Amazon Web Services (AWS) provider to interact with the many resources supported by AWS.
-####----------------------------------------------------------------------------------
 provider "aws" {
   region = local.region
 }
@@ -40,9 +37,10 @@ module "subnets" {
   source              = "./../../"
   nat_gateway_enabled = true
   single_nat_gateway  = true
-  name                = local.name
+  name                = "${local.name}-subnet"
   environment         = local.environment
-  availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  label_order         = local.label_order
+  availability_zones  = ["${local.region}a", "${local.region}b", "${local.region}c"]
   vpc_id              = module.vpc.vpc_id
   type                = "public-private"
   igw_id              = module.vpc.igw_id
@@ -50,8 +48,7 @@ module "subnets" {
   ipv6_cidr_block     = module.vpc.ipv6_cidr_block
   enable_ipv6         = false
 
-  # Restrictive private NACL: everything from inside the VPC, plus ephemeral ports from
-  # anywhere so return traffic coming back through the NAT gateway is allowed.
+  # Custom rules for VPC traffic and return traffic from public endpoints.
   private_inbound_acl_rules = [
     {
       rule_number = 100
@@ -77,5 +74,17 @@ module "subnets" {
       protocol    = "udp"
       cidr_block  = "0.0.0.0/0"
     },
+  ]
+
+  # Permit private subnet workloads to initiate outbound connections.
+  private_outbound_acl_rules = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    }
   ]
 }
