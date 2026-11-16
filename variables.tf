@@ -25,13 +25,13 @@ variable "environment" {
 }
 
 variable "label_order" {
-  type        = list(any)
+  type        = list(string)
   default     = ["name", "environment"]
   description = "Label order, e.g. `name`,`Environment`."
 }
 
 variable "attributes" {
-  type        = list(any)
+  type        = list(string)
   default     = []
   description = "Additional attributes (e.g. `1`)."
 }
@@ -42,16 +42,22 @@ variable "delimiter" {
   description = "Delimiter to be used between `organization`, `environment`, `name` and `attributes`."
 }
 
-variable "extra_public_tags" {
-  type        = map(any)
+variable "tags" {
+  type        = map(string)
   default     = {}
-  description = "Additional public subnet tags."
+  description = "Additional tags applied to every resource created by this module (e.g. `{ Team = \"platform\" }`). Label tags (Name, Environment, ...) take precedence."
+}
+
+variable "extra_public_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Additional tags applied to public subnets only (e.g. `{ \"kubernetes.io/role/elb\" = \"1\" }`)."
 }
 
 variable "extra_private_tags" {
-  type        = map(any)
+  type        = map(string)
   default     = {}
-  description = "Additional private subnet tags."
+  description = "Additional tags applied to private subnets only (e.g. `{ \"kubernetes.io/role/internal-elb\" = \"1\" }`)."
 }
 
 variable "managedby" {
@@ -65,7 +71,12 @@ variable "managedby" {
 variable "availability_zones" {
   type        = list(string)
   default     = []
-  description = "List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)."
+  description = "List of Availability Zones (e.g. `[\"us-east-1a\", \"us-east-1b\", \"us-east-1c\"]`). One subnet of each requested kind is created per AZ."
+
+  validation {
+    condition     = length(var.availability_zones) == length(distinct(var.availability_zones))
+    error_message = "availability_zones must not contain duplicates."
+  }
 }
 
 variable "type" {
@@ -81,35 +92,41 @@ variable "type" {
 
 variable "vpc_id" {
   type        = string
-  description = "VPC ID."
-  sensitive   = true
+  description = "ID of the existing VPC in which the subnets are created (e.g. `vpc-0abc1234def567890`)."
 }
 
 variable "cidr_block" {
   type        = string
   default     = null
-  description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+  description = "Base IPv4 CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`). Not needed when `ipv4_public_cidrs` / `ipv4_private_cidrs` are set."
+
+  validation {
+    condition     = var.cidr_block == null || can(cidrnetmask(var.cidr_block))
+    error_message = "cidr_block must be a valid IPv4 CIDR block (e.g. `10.0.0.0/16`)."
+  }
 }
 
 variable "ipv6_cidr_block" {
   type        = string
   default     = null
-  description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+  description = "IPv6 CIDR block of the VPC, divided into /64 subnet CIDRs when `enable_ipv6 = true` (e.g. `2a05:d018:832:ca00::/56`)."
+
+  validation {
+    condition     = var.ipv6_cidr_block == null || can(cidrhost(var.ipv6_cidr_block, 0))
+    error_message = "ipv6_cidr_block must be a valid IPv6 CIDR (e.g. `2a05:d018:832:ca00::/56`)."
+  }
 }
 
 variable "public_subnet_ids" {
   type        = list(string)
   default     = []
-  description = "A list of public subnet ids."
-  sensitive   = true
-
+  description = "Existing public subnet IDs used to place NAT gateways when `type = \"private\"` (ignored when this module creates the public subnets)."
 }
 
 variable "igw_id" {
   type        = string
   default     = ""
-  description = "Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`)."
-  sensitive   = true
+  description = "Internet Gateway ID used as the default route of the public subnets (e.g. `igw-9c26a123`). Required when `type` is `public` or `public-private`."
 }
 
 variable "enable" {
@@ -121,13 +138,13 @@ variable "enable" {
 variable "enable_public_acl" {
   type        = bool
   default     = true
-  description = "Set to false to prevent the module from creating any resources."
+  description = "Set to false to skip creating the Network ACL (and its rules) for the public subnets."
 }
 
 variable "enable_private_acl" {
   type        = bool
   default     = true
-  description = "Set to false to prevent the module from creating any resources."
+  description = "Set to false to skip creating the Network ACL (and its rules) for the private subnets."
 }
 
 variable "nat_gateway_enabled" {
@@ -139,7 +156,7 @@ variable "nat_gateway_enabled" {
 variable "enable_flow_log" {
   type        = bool
   default     = false
-  description = "Enable subnet_flow_log logs."
+  description = "Create a VPC Flow Log for every subnet created by this module. Requires `flow_log_destination_arn` (and `flow_log_iam_role_arn` for CloudWatch Logs)."
 }
 
 variable "map_public_ip_on_launch" {
@@ -153,20 +170,29 @@ variable "map_public_ip_on_launch" {
 variable "flow_log_destination_arn" {
   type        = string
   default     = null
-  description = "ARN of resource in which flow log will be sent."
-  sensitive   = true
+  description = "ARN of the CloudWatch Logs log group, S3 bucket or Firehose stream that receives the flow logs. Required when `enable_flow_log = true`."
 }
 
 variable "flow_log_destination_type" {
   type        = string
   default     = "cloud-watch-logs"
-  description = "Type of flow log destination. Can be s3 or cloud-watch-logs"
+  description = "Type of flow log destination. Can be `s3`, `cloud-watch-logs` or `kinesis-data-firehose`."
+
+  validation {
+    condition     = contains(["s3", "cloud-watch-logs", "kinesis-data-firehose"], var.flow_log_destination_type)
+    error_message = "flow_log_destination_type must be `s3`, `cloud-watch-logs` or `kinesis-data-firehose`."
+  }
 }
 
 variable "flow_log_traffic_type" {
   type        = string
   default     = "ALL"
   description = "Type of traffic to capture. Valid values: ACCEPT,REJECT, ALL."
+
+  validation {
+    condition     = contains(["ACCEPT", "REJECT", "ALL"], var.flow_log_traffic_type)
+    error_message = "flow_log_traffic_type must be `ACCEPT`, `REJECT` or `ALL`."
+  }
 }
 
 variable "flow_log_log_format" {
@@ -185,6 +211,11 @@ variable "flow_log_max_aggregation_interval" {
   type        = number
   default     = 600
   description = "The maximum interval of time during which a flow of packets is captured and aggregated into a flow log record. Valid Values: `60` seconds or `600` seconds"
+
+  validation {
+    condition     = contains([60, 600], var.flow_log_max_aggregation_interval)
+    error_message = "flow_log_max_aggregation_interval must be 60 or 600."
+  }
 }
 
 variable "flow_log_file_format" {
@@ -206,26 +237,36 @@ variable "flow_log_per_hour_partition" {
 }
 
 variable "public_ipv6_cidrs" {
-  type        = list(any)
+  type        = list(string)
   default     = []
   description = "Public Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
 }
 
 variable "private_ipv6_cidrs" {
-  type        = list(any)
+  type        = list(string)
   default     = []
   description = "Private Subnet CIDR blocks (e.g. `2a05:d018:832:ca02::/64`)."
 }
 
 variable "ipv4_public_cidrs" {
-  type        = list(any)
+  type        = list(string)
   default     = []
-  description = "Subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+  description = "Explicit IPv4 CIDRs for the public subnets, one per availability zone, in the same order. When empty, CIDRs are derived from `cidr_block`."
+
+  validation {
+    condition     = alltrue([for c in var.ipv4_public_cidrs : can(cidrnetmask(c))])
+    error_message = "Every entry of ipv4_public_cidrs must be a valid IPv4 CIDR block."
+  }
 }
 variable "ipv4_private_cidrs" {
-  type        = list(any)
+  type        = list(string)
   default     = []
-  description = "Subnet CIDR blocks (e.g. `10.0.0.0/16`)."
+  description = "Explicit IPv4 CIDRs for the private subnets, one per availability zone, in the same order. When empty, CIDRs are derived from `cidr_block`."
+
+  validation {
+    condition     = alltrue([for c in var.ipv4_private_cidrs : can(cidrnetmask(c))])
+    error_message = "Every entry of ipv4_private_cidrs must be a valid IPv4 CIDR block."
+  }
 }
 
 variable "single_nat_gateway" {
@@ -273,13 +314,13 @@ variable "private_subnet_ipv6_native" {
 variable "enable_ipv6" {
   type        = bool
   default     = false
-  description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block"
+  description = "Enable IPv6 on the subnets. The VPC must already have an IPv6 CIDR block; pass it via `ipv6_cidr_block`."
 }
 
 variable "public_subnet_enable_dns64" {
   type        = bool
   default     = false
-  description = "Indicates whether DNS queries made to the Amazon-provided DNS Resolver in this subnet should return synthetic IPv6 addresses for IPv4-only destinations. Default: `true`"
+  description = "Indicates whether DNS queries made to the Amazon-provided DNS Resolver in this subnet should return synthetic IPv6 addresses for IPv4-only destinations. Default: `false`"
 }
 
 variable "private_subnet_enable_dns64" {
@@ -325,6 +366,14 @@ variable "public_inbound_acl_rules" {
     },
   ]
   description = "Public subnets inbound network ACLs"
+
+  validation {
+    condition = alltrue([
+      for r in var.public_inbound_acl_rules :
+      can(tonumber(r.rule_number)) && try(tonumber(r.rule_number) >= 1 && tonumber(r.rule_number) <= 32766, false) && contains(["allow", "deny"], try(r.rule_action, ""))
+    ])
+    error_message = "public_inbound_acl_rules: every rule needs a rule_number between 1 and 32766 and rule_action `allow` or `deny`."
+  }
 }
 
 variable "public_outbound_acl_rules" {
@@ -340,6 +389,14 @@ variable "public_outbound_acl_rules" {
     },
   ]
   description = "Public subnets outbound network ACLs"
+
+  validation {
+    condition = alltrue([
+      for r in var.public_outbound_acl_rules :
+      can(tonumber(r.rule_number)) && try(tonumber(r.rule_number) >= 1 && tonumber(r.rule_number) <= 32766, false) && contains(["allow", "deny"], try(r.rule_action, ""))
+    ])
+    error_message = "public_outbound_acl_rules: every rule needs a rule_number between 1 and 32766 and rule_action `allow` or `deny`."
+  }
 }
 
 variable "private_inbound_acl_rules" {
@@ -347,7 +404,7 @@ variable "private_inbound_acl_rules" {
   default = [
     {
       rule_number = 100
-      rule_action = "allow"
+      rule_action = "deny"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
@@ -355,6 +412,14 @@ variable "private_inbound_acl_rules" {
     },
   ]
   description = "Private subnets inbound network ACLs"
+
+  validation {
+    condition = alltrue([
+      for r in var.private_inbound_acl_rules :
+      can(tonumber(r.rule_number)) && try(tonumber(r.rule_number) >= 1 && tonumber(r.rule_number) <= 32766, false) && contains(["allow", "deny"], try(r.rule_action, ""))
+    ])
+    error_message = "private_inbound_acl_rules: every rule needs a rule_number between 1 and 32766 and rule_action `allow` or `deny`."
+  }
 }
 
 variable "private_outbound_acl_rules" {
@@ -362,7 +427,7 @@ variable "private_outbound_acl_rules" {
   default = [
     {
       rule_number = 100
-      rule_action = "allow"
+      rule_action = "deny"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
@@ -370,6 +435,14 @@ variable "private_outbound_acl_rules" {
     },
   ]
   description = "Private subnets outbound network ACLs"
+
+  validation {
+    condition = alltrue([
+      for r in var.private_outbound_acl_rules :
+      can(tonumber(r.rule_number)) && try(tonumber(r.rule_number) >= 1 && tonumber(r.rule_number) <= 32766, false) && contains(["allow", "deny"], try(r.rule_action, ""))
+    ])
+    error_message = "private_outbound_acl_rules: every rule needs a rule_number between 1 and 32766 and rule_action `allow` or `deny`."
+  }
 }
 
 variable "nat_gateway_destination_cidr_block" {

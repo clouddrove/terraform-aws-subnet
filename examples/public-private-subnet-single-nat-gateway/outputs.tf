@@ -29,7 +29,7 @@ output "public_tags" {
 }
 
 output "public_subnet_id" {
-  value       = module.subnets.private_subnet_id
+  value       = module.subnets.public_subnet_id
   description = "The ID of the public subnet"
 }
 
