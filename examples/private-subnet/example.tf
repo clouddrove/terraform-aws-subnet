@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-west-1"
+  region = "ca-central-1"
 }
 
 locals {
@@ -35,7 +35,7 @@ module "private-subnets" {
   name                = local.name
   environment         = local.environment
   nat_gateway_enabled = true
-  availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+  availability_zones  = ["ca-central-1a", "ca-central-1b", "ca-central-1d"]
   vpc_id              = module.vpc.vpc_id
   type                = "private"
   cidr_block          = module.vpc.vpc_cidr_block

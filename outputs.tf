@@ -6,6 +6,11 @@ output "public_subnet_id" {
   description = "The ID of the subnet."
 }
 
+output "public_subnet_arns" {
+  value       = aws_subnet.public[*].arn
+  description = "The ARNs of the created public subnets."
+}
+
 output "public_subnet_cidrs" {
   value       = aws_subnet.public[*].cidr_block
   description = "CIDR blocks of the created public subnets."
@@ -16,9 +21,19 @@ output "public_subnet_cidrs_ipv6" {
   description = "CIDR blocks of the created public subnets."
 }
 
+output "public_subnet_ipv6_cidr_block_association_ids" {
+  value       = aws_subnet.public[*].ipv6_cidr_block_association_id
+  description = "IPv6 CIDR association IDs for the created public subnets."
+}
+
 output "private_subnet_id" {
   value       = aws_subnet.private[*].id
   description = "The ID of the private subnet."
+}
+
+output "private_subnet_arns" {
+  value       = aws_subnet.private[*].arn
+  description = "The ARNs of the created private subnets."
 }
 
 output "private_subnet_cidrs" {
@@ -29,6 +44,11 @@ output "private_subnet_cidrs" {
 output "private_subnet_cidrs_ipv6" {
   value       = aws_subnet.private[*].ipv6_cidr_block
   description = "CIDR blocks of the created private subnets."
+}
+
+output "private_subnet_ipv6_cidr_block_association_ids" {
+  value       = aws_subnet.private[*].ipv6_cidr_block_association_id
+  description = "IPv6 CIDR association IDs for the created private subnets."
 }
 
 output "public_route_tables_id" {
@@ -76,12 +96,42 @@ output "nat_gateway_ids" {
   description = "IDs of created NAT Gateways."
 }
 
+output "nat_eip_allocation_ids" {
+  value       = aws_eip.private[*].id
+  description = "Allocation IDs of module-created NAT Gateway Elastic IPs."
+}
+
+output "regional_nat_gateway_addresses" {
+  value       = aws_nat_gateway.private[*].regional_nat_gateway_address
+  description = "Per-AZ address details for regional NAT Gateways."
+}
+
 output "public_subnet_azs" {
   value       = aws_subnet.public[*].availability_zone
   description = "Availability zones of created public subnets, in the same order as public_subnet_id."
 }
 
+output "public_subnet_az_ids" {
+  value       = aws_subnet.public[*].availability_zone_id
+  description = "Availability Zone IDs of created public subnets, in the same order as public_subnet_id."
+}
+
 output "private_subnet_azs" {
   value       = aws_subnet.private[*].availability_zone
   description = "Availability zones of created private subnets, in the same order as private_subnet_id."
+}
+
+output "private_subnet_az_ids" {
+  value       = aws_subnet.private[*].availability_zone_id
+  description = "Availability Zone IDs of created private subnets, in the same order as private_subnet_id."
+}
+
+output "public_subnet_flow_log_ids" {
+  value       = aws_flow_log.public_subnet_flow_log[*].id
+  description = "IDs of flow logs created for public subnets."
+}
+
+output "private_subnet_flow_log_ids" {
+  value       = aws_flow_log.private_subnet_flow_log[*].id
+  description = "IDs of flow logs created for private subnets."
 }

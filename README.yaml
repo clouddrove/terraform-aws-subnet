@@ -31,12 +31,12 @@ badges:
 prerequesties:
   - name: Terraform
     url: https://learn.hashicorp.com/terraform/getting-started/install.html
-    version: ">= 1.6.6"
+    version: ">= 1.10.0"
 
 providers:
   - name: aws
     url: https://aws.amazon.com/
-    version: ">= 5.31.0"
+    version: ">= 6.29.0"
 
 module_dependencies:
   - name: Labels Module
@@ -97,5 +97,24 @@ usage: |-
       igw_id             = module.vpc.igw_id
       ipv4_public_cidrs  = ["10.0.1.0/24", "10.0.13.0/24", "10.0.18.0/24"]
       enable_ipv6        = false
+    }
+  ```
+
+  ### IPAM-ALLOCATED SUBNET CIDRS
+  ```hcl
+    module "ipam_subnets" {
+      source = "clouddrove/terraform-aws-subnet/aws"
+
+      name                    = "ipam-subnets"
+      environment             = "test"
+      type                    = "public-private"
+      vpc_id                  = module.vpc.vpc_id
+      availability_zone_ids   = ["use1-az1", "use1-az2"]
+      ipv4_ipam_pool_id       = aws_vpc_ipam_pool.ipv4.id
+      ipv4_netmask_length     = 24
+      ipv6_ipam_pool_id       = aws_vpc_ipam_pool.ipv6.id
+      ipv6_netmask_length     = 64
+      enable_ipv6             = true
+      igw_id                  = module.vpc.igw_id
     }
   ```

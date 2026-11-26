@@ -2,10 +2,15 @@ provider "aws" {
   region = local.region
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 locals {
   name        = "app"
   environment = "test"
-  region      = "eu-west-1"
+  region      = "ca-central-1"
+  az_ids      = slice(data.aws_availability_zones.available.zone_ids, 0, 2)
 }
 
 ##-----------------------------------------------------------------------------
@@ -29,10 +34,17 @@ module "vpc" {
 }
 
 ##-----------------------------------------------------------------------------
-## VPN Gateway — used as route target in the examples below.
-## Replace gateway_id with your actual target resource ID
-## (transit_gateway_id, vpc_peering_connection_id, etc.)
+## EIP & VPN Gateway for complete example.
 ##-----------------------------------------------------------------------------
+resource "aws_eip" "nat" {
+  domain = "vpc"
+
+  tags = {
+    Name        = "${local.name}-${local.environment}-nat-eip"
+    Environment = local.environment
+  }
+}
+
 resource "aws_vpn_gateway" "this" {
   vpc_id = module.vpc.vpc_id
 
@@ -44,10 +56,11 @@ resource "aws_vpn_gateway" "this" {
 
 ##-----------------------------------------------------------------------------
 ## Subnet Module call.
-## Deploys public + private subnets across 3 AZs with:
-##   - IPv6 support
-##   - Network ACL rules
-##   - Custom route table entries
+## Deploys public + private subnets across 2 AZ IDs with:
+##   - Dual-stack IPv6 + EIGW + DNS64 + NAT64
+##   - External EIP reuse + single NAT Gateway
+##   - Network ACL rules & VGW route propagation
+##   - Custom route table entries & per-AZ/common tags
 ##-----------------------------------------------------------------------------
 #tfsec:ignore:aws-ec2-no-excessive-port-access
 #tfsec:ignore:aws-ec2-no-public-ingress-acl
@@ -57,21 +70,49 @@ module "subnets" {
   enable      = true
   name        = local.name
   environment = local.environment
+  region      = local.region
 
   ##---------------------------------------------------------------------------
   ## Subnet configuration.
   ##---------------------------------------------------------------------------
-  nat_gateway_enabled                            = true
-  single_nat_gateway                             = true
-  availability_zones                             = ["${local.region}a", "${local.region}b", "${local.region}c"]
-  vpc_id                                         = module.vpc.vpc_id
-  type                                           = "public-private"
-  igw_id                                         = module.vpc.igw_id
-  cidr_block                                     = module.vpc.vpc_cidr_block
-  ipv6_cidr_block                                = module.vpc.ipv6_cidr_block
-  public_subnet_assign_ipv6_address_on_creation  = true
-  enable_ipv6                                    = true
-  private_subnet_assign_ipv6_address_on_creation = true
+  nat_gateway_enabled                                           = true
+  single_nat_gateway                                            = true
+  reuse_nat_ips                                                 = true
+  external_nat_ip_ids                                           = [aws_eip.nat.id]
+  availability_zone_ids                                         = local.az_ids
+  vpc_id                                                        = module.vpc.vpc_id
+  type                                                          = "public-private"
+  igw_id                                                        = module.vpc.igw_id
+  enable_eigw                                                   = true
+  eigw_id                                                       = module.vpc.ipv6_egress_only_igw_id
+  cidr_block                                                    = module.vpc.vpc_cidr_block
+  ipv6_cidr_block                                               = module.vpc.ipv6_cidr_block
+  enable_ipv6                                                   = true
+  public_subnet_assign_ipv6_address_on_creation                 = true
+  private_subnet_assign_ipv6_address_on_creation                = true
+  public_subnet_enable_dns64                                    = true
+  private_subnet_enable_dns64                                   = true
+  enable_nat64                                                  = true
+  public_subnet_enable_resource_name_dns_aaaa_record_on_launch  = true
+  private_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
+  public_propagating_vgws                                       = [aws_vpn_gateway.this.id]
+  private_propagating_vgws                                      = [aws_vpn_gateway.this.id]
+
+  tags = {
+    Example = "complete"
+  }
+
+  public_subnet_tags_per_az = {
+    (local.az_ids[0]) = {
+      Tier = "public-primary"
+    }
+  }
+
+  private_subnet_tags_per_az = {
+    (local.az_ids[0]) = {
+      Tier = "private-primary"
+    }
+  }
 
   ##---------------------------------------------------------------------------
   ## Network ACL rules.
@@ -99,35 +140,7 @@ module "subnets" {
 
   ##---------------------------------------------------------------------------
   ## Custom Route Table entries.
-  ##
-  ## Two modes — use either or both:
-  ##
-  ## Mode 1 — for_all:
-  ##   Adds the same route to every AZ's route table.
-  ##   Use when all subnets need identical routing.
-  ##
-  ## Mode 2 — per_subnet:
-  ##   Adds different routes to specific AZs only.
-  ##   Key must be the exact AZ name string (e.g. "eu-west-1a").
-  ##   AZs not listed here are untouched.
-  ##
-  ## Both modes are optional — omitting either adds no extra routes.
-  ## All routes are removed when enable = false.
-  ##
-  ## Supported target keys (set only ONE per route entry):
-  ##   gateway_id              — Internet Gateway or VPN Gateway
-  ##   nat_gateway_id          — NAT Gateway
-  ##   transit_gateway_id      — Transit Gateway
-  ##   vpc_peering_connection_id — VPC Peering Connection
-  ##   network_interface_id    — Elastic Network Interface
-  ##   egress_only_gateway_id  — Egress-Only Internet Gateway (IPv6)
-  ##   carrier_gateway_id      — Carrier Gateway
-  ##   local_gateway_id        — Local Gateway (Outposts)
-  ##   core_network_arn        — Cloud WAN Core Network
   ##---------------------------------------------------------------------------
-
-  # Mode 1: Same route added to ALL public route tables.
-  # eu-west-1a, eu-west-1b and eu-west-1c all get this entry.
   additional_public_routes_for_all = [
     {
       destination_cidr_block = "10.100.0.0/16"
@@ -135,18 +148,14 @@ module "subnets" {
     }
   ]
 
-  # Mode 2: Different route per specific public subnet.
-  # AZ key must match exactly what is passed in availability_zones.
-  # Using local.region ensures one place to change the region.
-
   additional_public_routes_per_subnet = {
-    "${local.region}a" = [
+    (local.az_ids[0]) = [
       {
         destination_cidr_block = "192.168.1.0/24"
         gateway_id             = aws_vpn_gateway.this.id
       }
     ]
-    "${local.region}b" = [
+    (local.az_ids[1]) = [
       {
         destination_cidr_block = "192.168.2.0/24"
         gateway_id             = aws_vpn_gateway.this.id
@@ -154,23 +163,10 @@ module "subnets" {
     ]
   }
 
-  # Mode 1: Same route added to ALL private route tables.
   additional_private_routes_for_all = [
     {
       destination_cidr_block = "10.100.0.0/16"
       gateway_id             = aws_vpn_gateway.this.id
     }
   ]
-
-  # Mode 2: Different route per specific private subnet.
-  # Only eu-west-1a will get this extra entry.
-  # eu-west-1b and eu-west-1c only get the for_all route above.
-  additional_private_routes_per_subnet = {
-    "${local.region}a" = [
-      {
-        destination_cidr_block = "192.168.10.0/24"
-        gateway_id             = aws_vpn_gateway.this.id
-      }
-    ]
-  }
 }
