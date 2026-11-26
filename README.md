@@ -59,8 +59,8 @@ This table contains both Prerequisites and Providers:
 
 | Description   | Name                                       | Version   |
 |:-------------:|:-------------------------------------------:|:---------:|
-| **Prerequisite** | [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html) | >= 1.6.6 |
-| **Provider** | [aws](https://aws.amazon.com/) | >= 5.31.0 |
+| **Prerequisite** | [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html) | >= 1.10.0 |
+| **Provider** | [aws](https://aws.amazon.com/) | >= 6.29.0 |
 
 
 
