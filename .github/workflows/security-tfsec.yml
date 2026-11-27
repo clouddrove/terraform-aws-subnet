@@ -1,10 +1,17 @@
 name: tfsec
 permissions: write-all
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**/*.tf'
+      - '*.tf'
   pull_request:
     paths:
       - '**/*.tf'
       - '*.tf'
+  workflow_dispatch:    
 jobs:
   tfsec:
     if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.fork != true
