@@ -13,11 +13,11 @@ on:
       - '**/*.tf'
       - '*.tf'
 jobs:
-  tf-checks-aws-managed-example:
+  tf-checks-basic-example:
     if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
     with:
-      working_directory: './examples/aws_managed/'
+      working_directory: './examples/basic/'
       provider: 'aws'
       target_branch: 'master'
       aws_region: 'ca-central-1'
@@ -33,13 +33,33 @@ jobs:
       aws_region: 'ca-central-1'
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
-  tf-checks-self-managed-example:
+  tf-checks-private-subnet-example:
     if: github.actor != 'dependabot[bot]'
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
     with:
-      working_directory: './examples/self_managed/'
+      working_directory: './examples/private-subnet/'
       provider: 'aws'
       target_branch: 'master'
       aws_region: 'ca-central-1'
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
+  tf-checks-public-private-subnet-single-nat-gateway-example:
+    if: github.actor != 'dependabot[bot]'
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
+    with:
+      working_directory: './examples/public-private-subnet-single-nat-gateway/'
+      provider: 'aws'
+      target_branch: 'master'
+      aws_region: 'ca-central-1'
+    secrets:
+      BUILD_ROLE: ${{ secrets.BUILD_ROLE }}    
+  tf-checks-public-subnet-example:
+    if: github.actor != 'dependabot[bot]'
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@v2
+    with:
+      working_directory: './examples/public-subnet/'
+      provider: 'aws'
+      target_branch: 'master'
+      aws_region: 'ca-central-1'
+    secrets:
+      BUILD_ROLE: ${{ secrets.BUILD_ROLE }}      
