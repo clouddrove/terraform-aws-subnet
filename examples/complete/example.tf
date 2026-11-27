@@ -5,7 +5,7 @@ provider "aws" {
 locals {
   name        = "app"
   environment = "test"
-  region      = "eu-west-1"
+  region      = "ca-central-1"
 }
 
 ##-----------------------------------------------------------------------------

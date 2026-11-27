@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "ca-central-1"
 }
 
 locals {
@@ -33,7 +33,7 @@ module "subnets" {
   source             = "./../../"
   name               = local.name
   environment        = local.environment
-  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones = ["ca-central-1a", "ca-central-1b", "ca-central-1c"]
   vpc_id             = module.vpc.vpc_id
   type               = "public"
   igw_id             = module.vpc.igw_id
